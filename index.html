@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioGenesis: Cellular Evolution Simulator</title>
+    <title>BioGenesis: Enhanced Cellular Evolution Simulator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -41,19 +41,19 @@
         .game-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
         
         header {
             text-align: center;
-            padding: 20px 0;
+            padding: 15px 0;
             margin-bottom: 20px;
             position: relative;
         }
         
         h1 {
-            font-size: 3.2rem;
-            margin-bottom: 10px;
+            font-size: 2.8rem;
+            margin-bottom: 8px;
             background: linear-gradient(to right, var(--membrane), var(--nucleus), var(--mitochondria), var(--evolution));
             -webkit-background-clip: text;
             background-clip: text;
@@ -62,220 +62,35 @@
         }
         
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             opacity: 0.8;
             color: var(--text-secondary);
         }
         
         .game-layout {
             display: grid;
-            grid-template-columns: 300px 1fr 300px;
-            grid-template-rows: auto 1fr auto;
-            gap: 20px;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
             height: 85vh;
         }
         
-        /* Top Stats Panel */
-        .stats-panel {
-            grid-column: 1 / -1;
+        .control-panel {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 15px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 10px 15px;
-            text-align: center;
-            flex: 1;
-            margin: 0 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .stat-name {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--cytoplasm);
-        }
-        
-        .stat-progress {
-            height: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-        
-        /* Left Panel - Resources & Organelles */
-        .left-panel {
-            display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-        
-        .resource-panel, .organelle-panel, .environment-panel {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-        }
-        
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .panel-title {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-        }
-        
-        .resource-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .resource-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .resource-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .resource-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-        
-        .resource-info {
-            flex: 1;
-        }
-        
-        .resource-name {
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        
-        .resource-amount {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-        
-        .organelle-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
+            gap: 15px;
             overflow-y: auto;
-        }
-        
-        .organelle-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .organelle-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .organelle-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-        
-        .organelle-info {
-            flex: 1;
-        }
-        
-        .organelle-name {
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        
-        .organelle-status {
-            font-size: 0.7rem;
-            opacity: 0.8;
-        }
-        
-        .environment-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .environment-stat {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-        
-        .environment-name {
-            opacity: 0.8;
-        }
-        
-        .environment-value {
-            font-weight: bold;
-        }
-        
-        /* Center Panel - Cell View */
-        .center-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
         
         .cell-view {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            flex: 1;
+            border-radius: 12px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
+            gap: 15px;
             position: relative;
             overflow: hidden;
         }
@@ -283,7 +98,7 @@
         .cell-canvas-container {
             flex: 1;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
+            border-radius: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -294,19 +109,61 @@
             display: block;
         }
         
-        .cell-controls {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+        .resource-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
         }
         
-        .control-btn {
+        .resource-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .resource {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .resource-name {
+            font-size: 0.9rem;
+        }
+        
+        .resource-amount {
+            font-weight: bold;
+            color: var(--cytoplasm);
+        }
+        
+        .action-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .action-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .action-btn {
             background: var(--accent);
             border: none;
             color: white;
-            padding: 12px 10px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
@@ -315,80 +172,119 @@
             align-items: center;
             gap: 5px;
             text-align: center;
+            font-size: 0.85rem;
         }
         
-        .control-btn:hover:not(:disabled) {
+        .action-btn:hover:not(:disabled) {
             background: #00a5bb;
             transform: translateY(-2px);
         }
         
-        .control-btn:disabled {
+        .action-btn:disabled {
             background: var(--primary-light);
             cursor: not-allowed;
             opacity: 0.6;
         }
         
-        .control-btn i {
-            font-size: 1.2rem;
+        .action-cost {
+            font-size: 0.7rem;
+            opacity: 0.8;
         }
         
-        .control-btn .btn-text {
-            font-size: 0.8rem;
+        .action-reward {
+            font-size: 0.7rem;
+            color: var(--success);
         }
         
-        /* Right Panel - Evolution & Research */
-        .right-panel {
+        .organelle-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .organelle-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .organelle-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
         }
         
-        .evolution-panel, .research-panel, .events-panel {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-        }
-        
-        .evolution-progress {
-            margin-bottom: 15px;
-        }
-        
-        .progress-label {
+        .organelle-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 8px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
         
-        .progress-bar-container {
-            height: 10px;
+        .organelle-item:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
+        }
+        
+        .organelle-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+        
+        .organelle-info {
+            flex: 1;
+        }
+        
+        .organelle-name {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .organelle-status {
+            font-size: 0.65rem;
+            opacity: 0.8;
+        }
+        
+        .evolution-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .evolution-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
         }
         
         .evolution-options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .evolution-option {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px;
+            padding: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border-left: 3px solid transparent;
         }
         
         .evolution-option:hover:not(.disabled) {
             background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
-        }
-        
-        .evolution-option.active {
-            border-left-color: var(--evolution);
-            background: rgba(0, 255, 204, 0.1);
         }
         
         .evolution-option.disabled {
@@ -397,29 +293,47 @@
         }
         
         .evolution-name {
-            font-size: 1rem;
             font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .evolution-desc {
+            font-size: 0.7rem;
+            opacity: 0.8;
             margin-bottom: 5px;
         }
         
-        .evolution-description {
-            font-size: 0.8rem;
-            opacity: 0.8;
+        .evolution-cost {
+            font-size: 0.7rem;
+            color: var(--warning);
+        }
+        
+        .research-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .research-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
         }
         
         .research-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .research-item {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 6px;
+            padding: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s ease;
         }
         
@@ -428,14 +342,14 @@
         }
         
         .research-icon {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .research-info {
@@ -443,12 +357,12 @@
         }
         
         .research-name {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
         }
         
         .research-description {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.8;
         }
         
@@ -456,10 +370,10 @@
             background: var(--accent);
             border: none;
             color: white;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             transition: all 0.3s ease;
         }
         
@@ -473,81 +387,142 @@
             opacity: 0.6;
         }
         
+        .environment-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .environment-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .environment-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .environment-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .environment-name {
+            opacity: 0.8;
+        }
+        
+        .environment-value {
+            font-weight: bold;
+        }
+        
+        .events-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .events-panel h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
         .events-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
+            gap: 8px;
+            max-height: 180px;
             overflow-y: auto;
         }
         
         .event {
-            padding: 8px;
+            padding: 6px;
             border-left: 3px solid var(--accent);
             background: rgba(255, 255, 255, 0.05);
             border-radius: 0 5px 5px 0;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             animation: slideIn 0.5s ease;
         }
         
         .event-time {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.7;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
-        /* Bottom Panel - Additional Actions */
-        .action-panel {
-            grid-column: 1 / -1;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
+        .cell-stats {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
         
-        .action-btn {
+        .stat-card {
             background: rgba(255, 255, 255, 0.05);
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
+            border-radius: 6px;
+            padding: 8px;
             text-align: center;
         }
         
-        .action-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.1);
+        .stat-name {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--cytoplasm);
+        }
+        
+        .cell-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .control-btn:hover:not(:disabled) {
+            background: #00a5bb;
             transform: translateY(-2px);
         }
         
-        .action-btn:disabled {
-            opacity: 0.5;
+        .control-btn:disabled {
+            background: var(--primary-light);
             cursor: not-allowed;
+            opacity: 0.6;
         }
         
-        .action-btn i {
-            font-size: 1.2rem;
-        }
-        
-        .action-btn .btn-text {
-            font-size: 0.8rem;
-        }
-        
-        /* Notification */
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: var(--accent);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: 5px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             transform: translateX(150%);
@@ -555,8 +530,9 @@
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 10px;
-            max-width: 400px;
+            gap: 8px;
+            max-width: 350px;
+            font-size: 0.9rem;
         }
         
         .notification.show {
@@ -577,9 +553,8 @@
             color: #000;
         }
         
-        /* Animations */
         @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
+            from { transform: translateX(-15px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
         
@@ -593,46 +568,38 @@
             animation: pulse 0.5s ease;
         }
         
-        /* Responsive Design */
         @media (max-width: 1200px) {
             .game-layout {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr auto;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .control-panel {
+                flex-direction: row;
+                overflow-x: auto;
                 height: auto;
             }
             
-            .stats-panel {
-                grid-column: 1;
-            }
-            
-            .left-panel, .right-panel {
-                grid-column: 1;
-                flex-direction: row;
-                overflow-x: auto;
-            }
-            
-            .resource-panel, .organelle-panel, .environment-panel,
-            .evolution-panel, .research-panel, .events-panel {
-                min-width: 300px;
-            }
-            
-            .action-panel {
-                grid-column: 1;
-                grid-template-columns: repeat(3, 1fr);
+            .resource-panel, .action-panel, .organelle-panel, .evolution-panel, .research-panel, .environment-panel, .events-panel {
+                min-width: 220px;
             }
         }
         
         @media (max-width: 768px) {
             h1 {
-                font-size: 2.2rem;
+                font-size: 2rem;
             }
             
-            .left-panel, .right-panel {
+            .control-panel {
                 flex-direction: column;
             }
             
-            .cell-controls, .action-panel {
-                grid-template-columns: repeat(2, 1fr);
+            .cell-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -640,248 +607,113 @@
 <body>
     <div class="game-container">
         <header>
-            <h1>BioGenesis: Cellular Evolution Simulator</h1>
-            <div class="subtitle">Guide your cell from a simple prokaryote to a complex eukaryotic organism</div>
+            <h1>BioGenesis: Enhanced Cellular Evolution</h1>
+            <div class="subtitle">Guide your cell from simple organism to complex lifeform</div>
         </header>
         
         <div class="game-layout">
-            <!-- Top Stats Panel -->
-            <div class="stats-panel">
-                <div class="stat-card">
-                    <div class="stat-name">Cell Health</div>
-                    <div class="stat-value" id="cell-health">100%</div>
-                    <div class="stat-progress">
-                        <div class="progress-bar" id="health-bar" style="width: 100%; background: var(--success);"></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-name">Energy (ATP)</div>
-                    <div class="stat-value" id="atp-stat">100</div>
-                    <div class="stat-progress">
-                        <div class="progress-bar" id="atp-bar" style="width: 100%; background: var(--cytoplasm);"></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-name">Cell Age</div>
-                    <div class="stat-value" id="cell-age">0</div>
-                    <div class="stat-progress">
-                        <div class="progress-bar" id="age-bar" style="width: 0%; background: var(--nucleus);"></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-name">Division Readiness</div>
-                    <div class="stat-value" id="division-readiness">0%</div>
-                    <div class="stat-progress">
-                        <div class="progress-bar" id="division-bar" style="width: 0%; background: var(--membrane);"></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-name">Evolution Stage</div>
-                    <div class="stat-value" id="evolution-stage">Prokaryote</div>
-                    <div class="stat-progress">
-                        <div class="progress-bar" id="evolution-bar" style="width: 0%; background: var(--evolution);"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Left Panel -->
-            <div class="left-panel">
+            <div class="control-panel">
                 <div class="resource-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Cell Resources</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="auto-absorb-btn" title="Auto Absorb">
-                                <i class="fas fa-sync-alt"></i>
-                                <span class="btn-text">Auto</span>
-                            </button>
-                        </div>
+                    <h3>Cell Resources</h3>
+                    <div class="resource">
+                        <span class="resource-name">ATP (Energy)</span>
+                        <span class="resource-amount" id="atp">100</span>
                     </div>
-                    <div class="resource-grid">
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--cytoplasm); color: black;">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">ATP</div>
-                                <div class="resource-amount" id="atp">100</div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--membrane); color: white;">
-                                <i class="fas fa-cube"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">Glucose</div>
-                                <div class="resource-amount" id="glucose">50</div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--nucleus); color: white;">
-                                <i class="fas fa-dna"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">Amino Acids</div>
-                                <div class="resource-amount" id="amino-acids">25</div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--mitochondria); color: white;">
-                                <i class="fas fa-oil-can"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">Lipids</div>
-                                <div class="resource-amount" id="lipids">10</div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--ribosome); color: white;">
-                                <i class="fas fa-code"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">Nucleotides</div>
-                                <div class="resource-amount" id="nucleotides">5</div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="background: var(--evolution); color: black;">
-                                <i class="fas fa-atom"></i>
-                            </div>
-                            <div class="resource-info">
-                                <div class="resource-name">Enzymes</div>
-                                <div class="resource-amount" id="enzymes">0</div>
-                            </div>
-                        </div>
+                    <div class="resource">
+                        <span class="resource-name">Glucose</span>
+                        <span class="resource-amount" id="glucose">50</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Amino Acids</span>
+                        <span class="resource-amount" id="amino-acids">25</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Lipids</span>
+                        <span class="resource-amount" id="lipids">10</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Nucleotides</span>
+                        <span class="resource-amount" id="nucleotides">5</span>
+                    </div>
+                </div>
+                
+                <div class="action-panel">
+                    <h3>Cell Actions</h3>
+                    <div class="action-grid">
+                        <button class="action-btn" id="absorb-btn">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Absorb Nutrients</span>
+                            <div class="action-cost">Cost: 5 ATP</div>
+                            <div class="action-reward">Gain: Various Nutrients</div>
+                        </button>
+                        <button class="action-btn" id="metabolize-btn">
+                            <i class="fas fa-bolt"></i>
+                            <span>Metabolize Glucose</span>
+                            <div class="action-cost">Cost: 10 Glucose</div>
+                            <div class="action-reward">Gain: 20 ATP</div>
+                        </button>
+                        <button class="action-btn" id="synthesize-btn">
+                            <i class="fas fa-dna"></i>
+                            <span>Synthesize Proteins</span>
+                            <div class="action-cost">Cost: 5 Amino Acids</div>
+                            <div class="action-reward">Gain: 1 Enzyme</div>
+                        </button>
+                        <button class="action-btn" id="replicate-btn">
+                            <i class="fas fa-copy"></i>
+                            <span>Replicate DNA</span>
+                            <div class="action-cost">Cost: 10 Nucleotides</div>
+                            <div class="action-reward">Gain: Division Progress</div>
+                        </button>
+                        <button class="action-btn" id="repair-btn">
+                            <i class="fas fa-band-aid"></i>
+                            <span>Repair Cell</span>
+                            <div class="action-cost">Cost: 20 ATP, 10 Amino Acids</div>
+                            <div class="action-reward">Gain: 30 Health</div>
+                        </button>
+                        <button class="action-btn" id="defend-btn">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Defend Cell</span>
+                            <div class="action-cost">Cost: 15 ATP</div>
+                            <div class="action-reward">Gain: Temporary Protection</div>
+                        </button>
                     </div>
                 </div>
                 
                 <div class="organelle-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Organelles</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="upgrade-all-btn" title="Upgrade All">
-                                <i class="fas fa-arrow-up"></i>
-                                <span class="btn-text">Upgrade</span>
-                            </button>
-                        </div>
-                    </div>
+                    <h3>Organelles</h3>
                     <div class="organelle-list" id="organelle-list">
                         <!-- Organelles will be populated by JavaScript -->
                     </div>
                 </div>
                 
-                <div class="environment-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Environment</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="change-environment-btn" title="Change Environment">
-                                <i class="fas fa-globe-americas"></i>
-                                <span class="btn-text">Change</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="environment-info">
-                        <div class="environment-stat">
-                            <span class="environment-name">Temperature</span>
-                            <span class="environment-value" id="temperature">37°C</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">pH Level</span>
-                            <span class="environment-value" id="ph-level">7.2</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">Nutrient Density</span>
-                            <span class="environment-value" id="nutrient-density">Medium</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">Oxygen Level</span>
-                            <span class="environment-value" id="oxygen-level">Normal</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">Threat Level</span>
-                            <span class="environment-value" id="threat-level">Low</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Center Panel -->
-            <div class="center-panel">
-                <div class="cell-view">
-                    <div class="cell-canvas-container">
-                        <canvas id="cellCanvas"></canvas>
-                    </div>
-                    <div class="cell-controls">
-                        <button class="control-btn" id="absorb-btn">
-                            <i class="fas fa-arrow-down"></i>
-                            <span class="btn-text">Absorb Nutrients</span>
-                        </button>
-                        <button class="control-btn" id="divide-btn" disabled>
-                            <i class="fas fa-divide"></i>
-                            <span class="btn-text">Cell Division</span>
-                        </button>
-                        <button class="control-btn" id="evolve-btn" disabled>
-                            <i class="fas fa-atom"></i>
-                            <span class="btn-text">Evolve</span>
-                        </button>
-                        <button class="control-btn" id="repair-btn">
-                            <i class="fas fa-band-aid"></i>
-                            <span class="btn-text">Repair Cell</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right Panel -->
-            <div class="right-panel">
                 <div class="evolution-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Evolution</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="auto-evolve-btn" title="Auto Evolve">
-                                <i class="fas fa-robot"></i>
-                                <span class="btn-text">Auto</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="evolution-progress">
-                        <div class="progress-label">
-                            <span>Evolution Progress</span>
-                            <span id="evolution-progress-text">0%</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" id="evolution-progress-bar" style="width: 0%; background: var(--evolution);"></div>
-                        </div>
-                    </div>
+                    <h3>Evolution Paths</h3>
                     <div class="evolution-options">
-                        <div class="evolution-option active" data-evolution="prokaryote">
+                        <div class="evolution-option" data-evolution="prokaryote">
                             <div class="evolution-name">Prokaryote</div>
-                            <div class="evolution-description">Basic cell with membrane</div>
+                            <div class="evolution-desc">Basic cell with membrane</div>
+                            <div class="evolution-cost">Requires: 100 ATP, 50 Nucleotides</div>
                         </div>
                         <div class="evolution-option disabled" data-evolution="eukaryote">
                             <div class="evolution-name">Eukaryote</div>
-                            <div class="evolution-description">Cell with nucleus</div>
+                            <div class="evolution-desc">Cell with nucleus and organelles</div>
+                            <div class="evolution-cost">Requires: 200 ATP, 100 Nucleotides</div>
                         </div>
                         <div class="evolution-option disabled" data-evolution="multicellular">
                             <div class="evolution-name">Multicellular</div>
-                            <div class="evolution-description">Cell colony formation</div>
+                            <div class="evolution-desc">Cell colony formation</div>
+                            <div class="evolution-cost">Requires: 500 ATP, 200 Nucleotides</div>
                         </div>
                         <div class="evolution-option disabled" data-evolution="specialized">
                             <div class="evolution-name">Specialized</div>
-                            <div class="evolution-description">Cell differentiation</div>
+                            <div class="evolution-desc">Cell differentiation</div>
+                            <div class="evolution-cost">Requires: 1000 ATP, 500 Nucleotides</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="research-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Research</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="auto-research-btn" title="Auto Research">
-                                <i class="fas fa-flask"></i>
-                                <span class="btn-text">Auto</span>
-                            </button>
-                        </div>
-                    </div>
+                    <h3>Research</h3>
                     <div class="research-list">
                         <div class="research-item">
                             <div class="research-icon">
@@ -913,29 +745,33 @@
                             </div>
                             <button class="research-btn" data-research="membrane-strength">Research</button>
                         </div>
-                        <div class="research-item">
-                            <div class="research-icon">
-                                <i class="fas fa-syringe"></i>
-                            </div>
-                            <div class="research-info">
-                                <div class="research-name">Enzyme Production</div>
-                                <div class="research-description">Unlocks enzyme creation</div>
-                            </div>
-                            <button class="research-btn" data-research="enzyme-production">Research</button>
+                    </div>
+                </div>
+                
+                <div class="environment-panel">
+                    <h3>Environment</h3>
+                    <div class="environment-info">
+                        <div class="environment-stat">
+                            <span class="environment-name">Temperature</span>
+                            <span class="environment-value" id="temperature">37°C</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">pH Level</span>
+                            <span class="environment-value" id="ph-level">7.2</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">Nutrient Density</span>
+                            <span class="environment-value" id="nutrient-density">Medium</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">Oxygen Level</span>
+                            <span class="environment-value" id="oxygen-level">Normal</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="events-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Cell Events</div>
-                        <div class="panel-actions">
-                            <button class="action-btn" id="clear-events-btn" title="Clear Events">
-                                <i class="fas fa-trash"></i>
-                                <span class="btn-text">Clear</span>
-                            </button>
-                        </div>
-                    </div>
+                    <h3>Cell Events</h3>
                     <div class="events-list" id="events-list">
                         <div class="event">
                             <div class="event-time">Just now</div>
@@ -945,32 +781,38 @@
                 </div>
             </div>
             
-            <!-- Bottom Action Panel -->
-            <div class="action-panel">
-                <button class="action-btn" id="metabolize-btn">
-                    <i class="fas fa-fire"></i>
-                    <span class="btn-text">Metabolize</span>
-                </button>
-                <button class="action-btn" id="synthesize-btn">
-                    <i class="fas fa-cogs"></i>
-                    <span class="btn-text">Synthesize</span>
-                </button>
-                <button class="action-btn" id="defense-btn">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="btn-text">Activate Defense</span>
-                </button>
-                <button class="action-btn" id="enzyme-btn">
-                    <i class="fas fa-vial"></i>
-                    <span class="btn-text">Produce Enzyme</span>
-                </button>
-                <button class="action-btn" id="mutation-btn">
-                    <i class="fas fa-dna"></i>
-                    <span class="btn-text">Induce Mutation</span>
-                </button>
-                <button class="action-btn" id="analyze-btn">
-                    <i class="fas fa-search"></i>
-                    <span class="btn-text">Analyze Cell</span>
-                </button>
+            <div class="cell-view">
+                <div class="cell-stats">
+                    <div class="stat-card">
+                        <div class="stat-name">Cell Health</div>
+                        <div class="stat-value" id="cell-health">100%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Cell Age</div>
+                        <div class="stat-value" id="cell-age">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Division Readiness</div>
+                        <div class="stat-value" id="division-readiness">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Evolution Stage</div>
+                        <div class="stat-value" id="evolution-stage">Prokaryote</div>
+                    </div>
+                </div>
+                
+                <div class="cell-canvas-container">
+                    <canvas id="cellCanvas"></canvas>
+                </div>
+                
+                <div class="cell-controls">
+                    <button class="control-btn" id="divide-btn" disabled>
+                        <i class="fas fa-divide"></i> Cell Division
+                    </button>
+                    <button class="control-btn" id="evolve-btn" disabled>
+                        <i class="fas fa-atom"></i> Evolve Cell
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1009,28 +851,22 @@
             research: {
                 'dna-replication': false,
                 'atp-synthesis': false,
-                'membrane-strength': false,
-                'enzyme-production': false
+                'membrane-strength': false
             },
             cell: {
                 health: 100,
                 age: 0,
                 divisionProgress: 0,
-                size: 1.0
+                size: 1.0,
+                defense: 0
             },
             environment: {
                 temperature: 37,
                 pH: 7.2,
                 nutrientDensity: 'medium',
-                oxygenLevel: 'normal',
-                threatLevel: 'low'
+                oxygenLevel: 'normal'
             },
-            events: [],
-            autoActions: {
-                absorb: false,
-                research: false,
-                evolve: false
-            }
+            events: []
         };
 
         // Canvas and rendering variables
@@ -1085,29 +921,17 @@
 
         // Set up event listeners
         function setupEventListeners() {
-            // Control buttons
+            // Action buttons
             document.getElementById('absorb-btn').addEventListener('click', absorbNutrients);
+            document.getElementById('metabolize-btn').addEventListener('click', metabolizeGlucose);
+            document.getElementById('synthesize-btn').addEventListener('click', synthesizeProteins);
+            document.getElementById('replicate-btn').addEventListener('click', replicateDNA);
+            document.getElementById('repair-btn').addEventListener('click', repairCell);
+            document.getElementById('defend-btn').addEventListener('click', defendCell);
+            
+            // Control buttons
             document.getElementById('divide-btn').addEventListener('click', cellDivision);
             document.getElementById('evolve-btn').addEventListener('click', evolveCell);
-            document.getElementById('repair-btn').addEventListener('click', repairCell);
-            
-            // Action buttons
-            document.getElementById('metabolize-btn').addEventListener('click', metabolize);
-            document.getElementById('synthesize-btn').addEventListener('click', synthesize);
-            document.getElementById('defense-btn').addEventListener('click', activateDefense);
-            document.getElementById('enzyme-btn').addEventListener('click', produceEnzyme);
-            document.getElementById('mutation-btn').addEventListener('click', induceMutation);
-            document.getElementById('analyze-btn').addEventListener('click', analyzeCell);
-            
-            // Auto action buttons
-            document.getElementById('auto-absorb-btn').addEventListener('click', toggleAutoAbsorb);
-            document.getElementById('auto-research-btn').addEventListener('click', toggleAutoResearch);
-            document.getElementById('auto-evolve-btn').addEventListener('click', toggleAutoEvolve);
-            
-            // Other buttons
-            document.getElementById('upgrade-all-btn').addEventListener('click', upgradeAllOrganelles);
-            document.getElementById('change-environment-btn').addEventListener('click', changeEnvironment);
-            document.getElementById('clear-events-btn').addEventListener('click', clearEvents);
             
             // Research buttons
             document.querySelectorAll('.research-btn').forEach(button => {
@@ -1163,9 +987,10 @@
             // Age the cell
             gameState.cell.age += elapsed / 10000;
             
-            // Auto actions
-            if (gameState.autoActions.absorb && Math.random() < 0.1) {
-                absorbNutrients();
+            // Decrease defense over time
+            if (gameState.cell.defense > 0) {
+                gameState.cell.defense -= 0.05 * (elapsed / 1000);
+                if (gameState.cell.defense < 0) gameState.cell.defense = 0;
             }
             
             // Randomly generate nutrients
@@ -1204,10 +1029,11 @@
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 
                 if (dist < cellRadius + 10) {
-                    // Threat damages cell
-                    damageCell(threat.damage);
+                    // Threat damages cell (reduced by defense)
+                    const actualDamage = Math.max(1, threat.damage - gameState.cell.defense);
+                    damageCell(actualDamage);
                     threats.splice(threats.indexOf(threat), 1);
-                    addEvent(`Cell damaged by ${threat.type}!`);
+                    addEvent(`Cell damaged by ${threat.type}! (-${actualDamage} health)`);
                 } else {
                     // Move toward cell
                     threat.x += (dx / dist) * threat.speed;
@@ -1270,11 +1096,17 @@
 
         // Draw the cell
         function drawCell() {
-            // Cell membrane
+            // Cell membrane with defense indicator
             ctx.beginPath();
             ctx.arc(cellX, cellY, cellRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#4caf50';
-            ctx.lineWidth = 3;
+            
+            if (gameState.cell.defense > 0) {
+                ctx.strokeStyle = '#00bcd4';
+                ctx.lineWidth = 5;
+            } else {
+                ctx.strokeStyle = '#4caf50';
+                ctx.lineWidth = 3;
+            }
             ctx.stroke();
             
             // Cytoplasm
@@ -1508,6 +1340,19 @@
                 ctx.font = '12px Arial';
                 ctx.fillText('Evolution Progress', canvas.width - 210, 45);
             }
+            
+            // Defense indicator
+            if (gameState.cell.defense > 0) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(canvas.width - 210, 80, 200, 20);
+                
+                ctx.fillStyle = '#00bcd4';
+                ctx.fillRect(canvas.width - 210, 80, 200 * (gameState.cell.defense / 10), 20);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Arial';
+                ctx.fillText('Defense', canvas.width - 210, 75);
+            }
         }
 
         // Generate nutrients
@@ -1592,6 +1437,67 @@
             updateUI();
         }
 
+        // Metabolize glucose into ATP
+        function metabolizeGlucose() {
+            if (gameState.resources.glucose < 10) {
+                showNotification("Not enough glucose to metabolize", 'warning');
+                return;
+            }
+            
+            gameState.resources.glucose -= 10;
+            gameState.resources.atp += 20;
+            
+            addEvent("Metabolized glucose into ATP");
+            showNotification("Glucose metabolized! +20 ATP");
+            updateUI();
+        }
+
+        // Synthesize proteins
+        function synthesizeProteins() {
+            if (gameState.resources.aminoAcids < 5) {
+                showNotification("Not enough amino acids to synthesize proteins", 'warning');
+                return;
+            }
+            
+            gameState.resources.aminoAcids -= 5;
+            gameState.resources.enzymes += 1;
+            
+            addEvent("Synthesized proteins into enzymes");
+            showNotification("Proteins synthesized! +1 Enzyme");
+            updateUI();
+        }
+
+        // Replicate DNA
+        function replicateDNA() {
+            if (gameState.resources.nucleotides < 10) {
+                showNotification("Not enough nucleotides to replicate DNA", 'warning');
+                return;
+            }
+            
+            gameState.resources.nucleotides -= 10;
+            gameState.cell.divisionProgress += 15;
+            if (gameState.cell.divisionProgress > 100) gameState.cell.divisionProgress = 100;
+            
+            addEvent("DNA replicated, division progress increased");
+            showNotification("DNA replicated! +15% Division Progress");
+            updateUI();
+        }
+
+        // Defend cell
+        function defendCell() {
+            if (gameState.resources.atp < 15) {
+                showNotification("Not enough ATP to defend cell", 'warning');
+                return;
+            }
+            
+            gameState.resources.atp -= 15;
+            gameState.cell.defense = 10; // Max defense value
+            
+            addEvent("Cell defense activated");
+            showNotification("Cell defense activated! Reduced damage from threats");
+            updateUI();
+        }
+
         // Absorb a single nutrient
         function absorbNutrient(nutrient) {
             switch(nutrient.type) {
@@ -1660,7 +1566,7 @@
             }
             
             addEvent("Cell repaired");
-            showNotification("Cell repaired!");
+            showNotification("Cell repaired! +30 Health");
             updateUI();
         }
 
@@ -1740,14 +1646,11 @@
                 
                 if (evolution === gameState.evolution.stage) {
                     option.style.background = 'rgba(0, 188, 212, 0.2)';
-                    option.classList.add('active');
                     option.classList.add('disabled');
                 } else if (evolution === gameState.evolution.nextStage && gameState.evolution.progress >= 100) {
                     option.classList.remove('disabled');
-                    option.classList.remove('active');
                 } else {
                     option.classList.add('disabled');
-                    option.classList.remove('active');
                 }
             });
         }
@@ -1830,10 +1733,6 @@
                     atpCost = 40;
                     nucleotideCost = 20;
                     break;
-                case 'enzyme-production':
-                    atpCost = 70;
-                    nucleotideCost = 35;
-                    break;
             }
             
             if (gameState.resources.atp < atpCost || gameState.resources.nucleotides < nucleotideCost) {
@@ -1869,232 +1768,9 @@
                     addEvent("Membrane Strength researched! Cell durability improved.");
                     showNotification("Membrane Strength researched!");
                     break;
-                case 'enzyme-production':
-                    // Unlock enzyme production
-                    addEvent("Enzyme Production researched! Can now produce enzymes.");
-                    showNotification("Enzyme Production researched!");
-                    break;
             }
             
             updateUI();
-        }
-
-        // New action: Metabolize
-        function metabolize() {
-            if (gameState.resources.glucose < 10) {
-                showNotification("Not enough glucose to metabolize", 'warning');
-                return;
-            }
-            
-            gameState.resources.glucose -= 10;
-            gameState.resources.atp += 20;
-            
-            addEvent("Glucose metabolized into ATP");
-            showNotification("Metabolized glucose into ATP!");
-            updateUI();
-        }
-
-        // New action: Synthesize
-        function synthesize() {
-            if (gameState.resources.atp < 15 || gameState.resources.aminoAcids < 5) {
-                showNotification("Not enough resources to synthesize", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 15;
-            gameState.resources.aminoAcids -= 5;
-            gameState.resources.enzymes += 2;
-            
-            addEvent("Amino acids synthesized into enzymes");
-            showNotification("Synthesized enzymes!");
-            updateUI();
-        }
-
-        // New action: Activate Defense
-        function activateDefense() {
-            if (gameState.resources.atp < 25 || gameState.resources.lipids < 5) {
-                showNotification("Not enough resources for defense", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 25;
-            gameState.resources.lipids -= 5;
-            
-            // Temporarily reduce threat damage
-            addEvent("Cell defense activated");
-            showNotification("Defense activated! Threat damage reduced temporarily.");
-            updateUI();
-        }
-
-        // New action: Produce Enzyme
-        function produceEnzyme() {
-            if (!gameState.research['enzyme-production']) {
-                showNotification("Enzyme production not researched yet", 'warning');
-                return;
-            }
-            
-            if (gameState.resources.atp < 10 || gameState.resources.aminoAcids < 3) {
-                showNotification("Not enough resources to produce enzyme", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 10;
-            gameState.resources.aminoAcids -= 3;
-            gameState.resources.enzymes += 1;
-            
-            addEvent("Enzyme produced");
-            showNotification("Enzyme produced!");
-            updateUI();
-        }
-
-        // New action: Induce Mutation
-        function induceMutation() {
-            if (gameState.resources.nucleotides < 15 || gameState.resources.atp < 30) {
-                showNotification("Not enough resources for mutation", 'warning');
-                return;
-            }
-            
-            gameState.resources.nucleotides -= 15;
-            gameState.resources.atp -= 30;
-            
-            // Random positive effect
-            const effects = [
-                { resource: 'atp', amount: 10 },
-                { resource: 'glucose', amount: 5 },
-                { organelle: 'membrane', health: 10 },
-                { evolution: 'progress', amount: 5 }
-            ];
-            
-            const effect = effects[Math.floor(Math.random() * effects.length)];
-            
-            if (effect.resource) {
-                gameState.resources[effect.resource] += effect.amount;
-                addEvent(`Mutation increased ${effect.resource} production`);
-                showNotification(`Mutation beneficial! ${effect.resource} production increased.`);
-            } else if (effect.organelle) {
-                gameState.organelles[effect.organelle].health += effect.health;
-                if (gameState.organelles[effect.organelle].health > 100) {
-                    gameState.organelles[effect.organelle].health = 100;
-                }
-                addEvent(`Mutation improved ${effect.organelle} health`);
-                showNotification(`Mutation beneficial! ${effect.organelle} health improved.`);
-            } else if (effect.evolution) {
-                gameState.evolution.progress += effect.amount;
-                if (gameState.evolution.progress > 100) gameState.evolution.progress = 100;
-                addEvent("Mutation accelerated evolution");
-                showNotification("Mutation beneficial! Evolution progress increased.");
-            }
-            
-            updateUI();
-        }
-
-        // New action: Analyze Cell
-        function analyzeCell() {
-            if (gameState.resources.atp < 5) {
-                showNotification("Not enough ATP for analysis", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 5;
-            
-            // Provide detailed cell information
-            const healthStatus = gameState.cell.health > 70 ? "Healthy" : gameState.cell.health > 30 ? "Stressed" : "Critical";
-            const divisionStatus = gameState.cell.divisionProgress > 80 ? "Ready Soon" : gameState.cell.divisionProgress > 40 ? "Progressing" : "Early Stage";
-            
-            addEvent(`Cell analysis: ${healthStatus} health, ${divisionStatus} division`);
-            showNotification(`Cell Analysis: ${healthStatus} health, ${divisionStatus} division`);
-            updateUI();
-        }
-
-        // Auto actions
-        function toggleAutoAbsorb() {
-            gameState.autoActions.absorb = !gameState.autoActions.absorb;
-            const btn = document.getElementById('auto-absorb-btn');
-            if (gameState.autoActions.absorb) {
-                btn.style.background = 'rgba(0, 188, 212, 0.3)';
-                addEvent("Auto-absorb activated");
-                showNotification("Auto-absorb activated");
-            } else {
-                btn.style.background = '';
-                addEvent("Auto-absorb deactivated");
-                showNotification("Auto-absorb deactivated");
-            }
-        }
-
-        function toggleAutoResearch() {
-            gameState.autoActions.research = !gameState.autoActions.research;
-            const btn = document.getElementById('auto-research-btn');
-            if (gameState.autoActions.research) {
-                btn.style.background = 'rgba(0, 188, 212, 0.3)';
-                addEvent("Auto-research activated");
-                showNotification("Auto-research activated");
-            } else {
-                btn.style.background = '';
-                addEvent("Auto-research deactivated");
-                showNotification("Auto-research deactivated");
-            }
-        }
-
-        function toggleAutoEvolve() {
-            gameState.autoActions.evolve = !gameState.autoActions.evolve;
-            const btn = document.getElementById('auto-evolve-btn');
-            if (gameState.autoActions.evolve) {
-                btn.style.background = 'rgba(0, 188, 212, 0.3)';
-                addEvent("Auto-evolve activated");
-                showNotification("Auto-evolve activated");
-            } else {
-                btn.style.background = '';
-                addEvent("Auto-evolve deactivated");
-                showNotification("Auto-evolve deactivated");
-            }
-        }
-
-        // Other functions
-        function upgradeAllOrganelles() {
-            let upgraded = false;
-            for (const organelle in gameState.organelles) {
-                if (gameState.organelles[organelle].level > 0 && gameState.organelles[organelle].health < 100) {
-                    if (gameState.resources.atp >= 10 && gameState.resources.aminoAcids >= 5) {
-                        gameState.resources.atp -= 10;
-                        gameState.resources.aminoAcids -= 5;
-                        gameState.organelles[organelle].health += 20;
-                        if (gameState.organelles[organelle].health > 100) {
-                            gameState.organelles[organelle].health = 100;
-                        }
-                        upgraded = true;
-                    }
-                }
-            }
-            
-            if (upgraded) {
-                addEvent("All organelles upgraded");
-                showNotification("Organelles upgraded!");
-            } else {
-                showNotification("Not enough resources to upgrade organelles", 'warning');
-            }
-            
-            updateUI();
-        }
-
-        function changeEnvironment() {
-            const environments = [
-                { temperature: 25, pH: 6.8, nutrientDensity: 'high', oxygenLevel: 'high', threatLevel: 'medium' },
-                { temperature: 37, pH: 7.2, nutrientDensity: 'medium', oxygenLevel: 'normal', threatLevel: 'low' },
-                { temperature: 45, pH: 7.8, nutrientDensity: 'low', oxygenLevel: 'low', threatLevel: 'high' }
-            ];
-            
-            const newEnv = environments[Math.floor(Math.random() * environments.length)];
-            Object.assign(gameState.environment, newEnv);
-            
-            addEvent("Environment changed");
-            showNotification("Environment changed!");
-            updateUI();
-        }
-
-        function clearEvents() {
-            const eventsList = document.getElementById('events-list');
-            eventsList.innerHTML = '';
-            addEvent("Event log cleared");
         }
 
         // Update the UI
@@ -2105,23 +1781,12 @@
             document.getElementById('amino-acids').textContent = Math.floor(gameState.resources.aminoAcids);
             document.getElementById('lipids').textContent = Math.floor(gameState.resources.lipids);
             document.getElementById('nucleotides').textContent = Math.floor(gameState.resources.nucleotides);
-            document.getElementById('enzymes').textContent = Math.floor(gameState.resources.enzymes);
             
-            // Update stat cards
+            // Update cell stats
             document.getElementById('cell-health').textContent = `${Math.floor(gameState.cell.health)}%`;
-            document.getElementById('atp-stat').textContent = Math.floor(gameState.resources.atp);
             document.getElementById('cell-age').textContent = Math.floor(gameState.cell.age);
             document.getElementById('division-readiness').textContent = `${Math.floor(gameState.cell.divisionProgress)}%`;
             document.getElementById('evolution-stage').textContent = gameState.evolution.stage.charAt(0).toUpperCase() + gameState.evolution.stage.slice(1);
-            
-            // Update progress bars
-            document.getElementById('health-bar').style.width = `${gameState.cell.health}%`;
-            document.getElementById('atp-bar').style.width = `${(gameState.resources.atp / 100) * 100}%`;
-            document.getElementById('age-bar').style.width = `${Math.min(gameState.cell.age, 100)}%`;
-            document.getElementById('division-bar').style.width = `${gameState.cell.divisionProgress}%`;
-            document.getElementById('evolution-bar').style.width = `${gameState.evolution.progress}%`;
-            document.getElementById('evolution-progress-bar').style.width = `${gameState.evolution.progress}%`;
-            document.getElementById('evolution-progress-text').textContent = `${Math.floor(gameState.evolution.progress)}%`;
             
             // Update organelle list
             updateOrganelleList();
@@ -2132,12 +1797,8 @@
             // Update evolution button
             document.getElementById('evolve-btn').disabled = gameState.evolution.progress < 100;
             
-            // Update environment
-            document.getElementById('temperature').textContent = `${gameState.environment.temperature}°C`;
-            document.getElementById('ph-level').textContent = gameState.environment.pH;
-            document.getElementById('nutrient-density').textContent = gameState.environment.nutrientDensity;
-            document.getElementById('oxygen-level').textContent = gameState.environment.oxygenLevel;
-            document.getElementById('threat-level').textContent = gameState.environment.threatLevel;
+            // Update action buttons based on available resources
+            updateActionButtons();
         }
 
         // Update organelle list
@@ -2226,6 +1887,27 @@
                     button.disabled = true;
                 }
             });
+        }
+
+        // Update action buttons based on available resources
+        function updateActionButtons() {
+            // Absorb nutrients
+            document.getElementById('absorb-btn').disabled = gameState.resources.atp < 5;
+            
+            // Metabolize glucose
+            document.getElementById('metabolize-btn').disabled = gameState.resources.glucose < 10;
+            
+            // Synthesize proteins
+            document.getElementById('synthesize-btn').disabled = gameState.resources.aminoAcids < 5;
+            
+            // Replicate DNA
+            document.getElementById('replicate-btn').disabled = gameState.resources.nucleotides < 10;
+            
+            // Repair cell
+            document.getElementById('repair-btn').disabled = gameState.resources.atp < 20 || gameState.resources.aminoAcids < 10;
+            
+            // Defend cell
+            document.getElementById('defend-btn').disabled = gameState.resources.atp < 15;
         }
 
         // Add event to events list
