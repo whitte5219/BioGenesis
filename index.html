@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioGenesis: Enhanced Cellular Evolution Simulator</title>
+    <title>BioGenesis: Complete Biological Simulator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-dark: #0a1929;
-            --primary-medium: #1a2b3c;
-            --primary-light: #2a3b4c;
-            --membrane: #4caf50;
-            --cytoplasm: #ffeb3b;
-            --nucleus: #2196f3;
-            --mitochondria: #f44336;
-            --ribosome: #9c27b0;
+            --cellular-dark: #0a1a0f;
+            --cellular-medium: #1a3b29;
+            --cellular-light: #2a5c43;
+            --dna-blue: #3b82f6;
+            --protein-orange: #f59e0b;
+            --enzyme-red: #ef4444;
+            --atp-yellow: #eab308;
+            --membrane-green: #10b981;
+            --mitochondria-purple: #8b5cf6;
             --text-primary: #ffffff;
-            --text-secondary: #b0ffb0;
-            --accent: #00bcd4;
-            --success: #4caf50;
-            --warning: #ffc107;
-            --danger: #f44336;
+            --text-secondary: #b0ffd0;
+            --accent: #00d4aa;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --evolution: #00ffcc;
         }
         
@@ -32,259 +33,521 @@
         }
         
         body {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+            background: linear-gradient(135deg, var(--cellular-dark) 0%, var(--cellular-medium) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
         }
         
-        .game-container {
-            max-width: 1400px;
+        .container {
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 20px;
         }
         
         header {
             text-align: center;
-            padding: 15px 0;
-            margin-bottom: 20px;
+            padding: 20px 0;
+            margin-bottom: 30px;
             position: relative;
         }
         
         h1 {
-            font-size: 2.8rem;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, var(--membrane), var(--nucleus), var(--mitochondria), var(--evolution));
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--membrane-green), var(--dna-blue), var(--mitochondria-purple), var(--evolution));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.8;
             color: var(--text-secondary);
         }
         
-        .game-layout {
+        .game-area {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+        }
+        
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
-            height: 85vh;
-        }
-        
-        .control-panel {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-        }
-        
-        .cell-view {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .cell-canvas-container {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #cellCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        
-        .resource-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-        }
-        
-        .resource-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
+            margin-bottom: 20px;
         }
         
         .resource {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resource::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+        }
+        
+        .resource:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
         
         .resource-name {
-            font-size: 0.9rem;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
         }
         
         .resource-amount {
+            font-size: 1.5rem;
             font-weight: bold;
-            color: var(--cytoplasm);
+            color: var(--membrane-green);
         }
         
-        .action-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
+        .resource-rate {
+            font-size: 0.8rem;
+            color: var(--success);
         }
         
-        .action-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
+        .tabs {
+            display: flex;
+            background: var(--cellular-medium);
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 15px 20px;
             text-align: center;
-            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            flex: 1;
+            min-width: 120px;
         }
         
-        .action-grid {
+        .tab.active {
+            background: var(--cellular-light);
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        .tab i {
+            margin-right: 8px;
+        }
+        
+        .tab-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="%23000"/><stop offset="100%" stop-color="%23000" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .cellular-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
-        .action-btn {
+        .cellular-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cellular-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+        
+        .cellular-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cellular-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .cellular-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px currentColor;
+        }
+        
+        .cellular-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .cellular-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .cellular-cost {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
             background: var(--accent);
             border: none;
             color: white;
-            padding: 10px;
+            padding: 12px 20px;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 5px;
-            text-align: center;
-            font-size: 0.85rem;
+            justify-content: center;
         }
         
-        .action-btn:hover:not(:disabled) {
-            background: #00a5bb;
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: #00b894;
             transform: translateY(-2px);
         }
         
-        .action-btn:disabled {
-            background: var(--primary-light);
+        .btn:disabled {
+            background: var(--cellular-light);
             cursor: not-allowed;
             opacity: 0.6;
         }
         
-        .action-cost {
-            font-size: 0.7rem;
-            opacity: 0.8;
+        .btn-warning {
+            background: var(--warning);
+            color: #000;
         }
         
-        .action-reward {
-            font-size: 0.7rem;
-            color: var(--success);
+        .btn-warning:hover:not(:disabled) {
+            background: #e0a800;
         }
         
-        .organelle-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
+        .btn-danger {
+            background: var(--danger);
         }
         
-        .organelle-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
+        .btn-danger:hover:not(:disabled) {
+            background: #d32f2f;
         }
         
-        .organelle-list {
+        .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 180px;
-            overflow-y: auto;
+            gap: 20px;
         }
         
-        .organelle-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            padding: 8px;
+        .organism-view {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
+            justify-content: center;
         }
         
-        .organelle-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .organism-view::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
         }
         
-        .organelle-icon {
-            width: 28px;
-            height: 28px;
+        .organism-display {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            box-shadow: 0 0 50px currentColor;
+            transition: all 1s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
         }
         
-        .organelle-info {
+        .organism-info {
+            margin-top: 15px;
+        }
+        
+        .organism-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .organism-stats {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .events {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
             flex: 1;
+            overflow-y: auto;
+            max-height: 300px;
         }
         
-        .organelle-name {
-            font-size: 0.85rem;
+        .events h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        
+        .event {
+            padding: 10px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0 5px 5px 0;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .event-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .stats {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .stats h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .achievement {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .achievement.unlocked {
+            opacity: 1;
+            border-color: var(--membrane-green);
+            box-shadow: 0 0 15px var(--membrane-green);
+            transform: scale(1.05);
+        }
+        
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--membrane-green);
+        }
+        
+        .achievement-name {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .research {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .research:hover {
+            transform: translateY(-5px);
+        }
+        
+        .research-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .research-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: var(--accent);
+        }
+        
+        .research-name {
+            font-size: 1.2rem;
             font-weight: bold;
         }
         
-        .organelle-status {
-            font-size: 0.65rem;
+        .research-description {
+            font-size: 0.9rem;
             opacity: 0.8;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .ecosystem-map {
+            height: 400px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .cell {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+        
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.5s ease;
         }
         
         .evolution-panel {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-        }
-        
-        .evolution-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
         }
         
         .evolution-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         
         .evolution-option {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .evolution-option:hover:not(.disabled) {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+        .evolution-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
         }
         
         .evolution-option.disabled {
@@ -292,237 +555,26 @@
             cursor: not-allowed;
         }
         
-        .evolution-name {
-            font-weight: bold;
-            font-size: 0.9rem;
+        .evolution-resource {
+            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--evolution);
         }
         
-        .evolution-desc {
-            font-size: 0.7rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
+        .evolution-resource::before {
+            background: var(--evolution);
         }
         
-        .evolution-cost {
-            font-size: 0.7rem;
-            color: var(--warning);
-        }
-        
-        .research-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-        }
-        
-        .research-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
-        }
-        
-        .research-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .research-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .research-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .research-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-        
-        .research-info {
-            flex: 1;
-        }
-        
-        .research-name {
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-        
-        .research-description {
-            font-size: 0.65rem;
-            opacity: 0.8;
-        }
-        
-        .research-btn {
-            background: var(--accent);
-            border: none;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.65rem;
-            transition: all 0.3s ease;
-        }
-        
-        .research-btn:hover:not(:disabled) {
-            background: #00a5bb;
-        }
-        
-        .research-btn:disabled {
-            background: var(--primary-light);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        .environment-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-        }
-        
-        .environment-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
-        }
-        
-        .environment-info {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .environment-stat {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-        }
-        
-        .environment-name {
-            opacity: 0.8;
-        }
-        
-        .environment-value {
-            font-weight: bold;
-        }
-        
-        .events-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        .events-panel h3 {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 1.1rem;
-        }
-        
-        .events-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        
-        .event {
-            padding: 6px;
-            border-left: 3px solid var(--accent);
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0 5px 5px 0;
-            font-size: 0.75rem;
-            animation: slideIn 0.5s ease;
-        }
-        
-        .event-time {
-            font-size: 0.65rem;
-            opacity: 0.7;
-            margin-bottom: 2px;
-        }
-        
-        .cell-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            padding: 8px;
-            text-align: center;
-        }
-        
-        .stat-name {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-bottom: 4px;
-        }
-        
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--cytoplasm);
-        }
-        
-        .cell-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        
-        .control-btn {
-            background: var(--accent);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 0.85rem;
-        }
-        
-        .control-btn:hover:not(:disabled) {
-            background: #00a5bb;
-            transform: translateY(-2px);
-        }
-        
-        .control-btn:disabled {
-            background: var(--primary-light);
-            cursor: not-allowed;
-            opacity: 0.6;
+        .evolution-resource .resource-amount {
+            color: var(--evolution);
         }
         
         .notification {
             position: fixed;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
             background: var(--accent);
             color: white;
-            padding: 12px 16px;
+            padding: 15px 20px;
             border-radius: 5px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             transform: translateX(150%);
@@ -530,9 +582,12 @@
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 8px;
-            max-width: 350px;
-            font-size: 0.9rem;
+            max-width: 400px;
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
         }
         
         .notification.show {
@@ -553,8 +608,240 @@
             color: #000;
         }
         
+        /* Cell Storage Styles */
+        .cell-storage {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .storage-slot {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .storage-slot:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .storage-slot.empty::after {
+            content: '+';
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .storage-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+            cursor: pointer;
+        }
+        
+        .cell-in-slot {
+            text-align: center;
+            width: 100%;
+            padding: 10px;
+        }
+        
+        .cell-slot-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        .cell-slot-name {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .cell-slot-level {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .cell-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .cell-details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .cell-details-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .cell-details-info {
+            flex: 1;
+        }
+        
+        .cell-details-name {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .cell-details-type {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .cell-details-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .cell-stat {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .cell-stat-name {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+        
+        .cell-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .cell-upgrades {
+            margin-top: 20px;
+        }
+        
+        .cell-upgrade {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .cell-upgrade:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+        
+        .cell-upgrade-info {
+            flex: 1;
+        }
+        
+        .cell-upgrade-name {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .cell-upgrade-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .cell-upgrade-cost {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 15px;
+        }
+        
+        .storage-upgrade {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .storage-upgrade-info {
+            flex: 1;
+        }
+        
+        .storage-upgrade-name {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .storage-upgrade-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .quick-action:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .quick-action i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
         @keyframes slideIn {
-            from { transform: translateX(-15px); opacity: 0; }
+            from { transform: translateX(-20px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
         
@@ -568,370 +855,1384 @@
             animation: pulse 0.5s ease;
         }
         
-        @media (max-width: 1200px) {
-            .game-layout {
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .twinkle {
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .rotate {
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes membrane-pulse {
+            0%, 100% { box-shadow: 0 0 30px var(--evolution); }
+            50% { box-shadow: 0 0 50px var(--evolution); }
+        }
+        
+        .membrane-pulse {
+            animation: membrane-pulse 3s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor; }
+        }
+        
+        .glow {
+            animation: glow 2s infinite;
+        }
+        
+        .dna-helix {
+            position: relative;
+            width: 40px;
+            height: 100px;
+        }
+        
+        .dna-strand {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: var(--dna-blue);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .dna-base {
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: var(--protein-orange);
+            left: 50%;
+            transform: translateX(-50%) rotate(var(--rotation));
+        }
+        
+        @media (max-width: 1300px) {
+            .game-area {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
             }
             
-            .control-panel {
-                flex-direction: row;
-                overflow-x: auto;
-                height: auto;
-            }
-            
-            .resource-panel, .action-panel, .organelle-panel, .evolution-panel, .research-panel, .environment-panel, .events-panel {
-                min-width: 220px;
+            .resources {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
         
         @media (max-width: 768px) {
+            .resources {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cellular-grid, .research-grid {
+                grid-template-columns: 1fr;
+            }
+            
             h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
-            .control-panel {
+            .cell-storage {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-actions {
                 flex-direction: column;
-            }
-            
-            .cell-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-grid {
-                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div class="container">
         <header>
-            <h1>BioGenesis: Enhanced Cellular Evolution</h1>
-            <div class="subtitle">Guide your cell from simple organism to complex lifeform</div>
+            <h1>BioGenesis: Complete Biological Simulator</h1>
+            <div class="subtitle">Create, evolve, and manage biological systems from cells to complex organisms</div>
         </header>
         
-        <div class="game-layout">
-            <div class="control-panel">
-                <div class="resource-panel">
-                    <h3>Cell Resources</h3>
+        <div class="quick-actions">
+            <div class="quick-action" data-tab="cells">
+                <i class="fas fa-circle"></i>
+                <span>Create Cells</span>
+            </div>
+            <div class="quick-action" data-tab="storage">
+                <i class="fas fa-box"></i>
+                <span>Cell Storage</span>
+            </div>
+            <div class="quick-action" data-tab="organelles">
+                <i class="fas fa-microscope"></i>
+                <span>Build Organelles</span>
+            </div>
+            <div class="quick-action" data-tab="research">
+                <i class="fas fa-flask"></i>
+                <span>Research</span>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="main-content">
+                <div class="resources">
                     <div class="resource">
-                        <span class="resource-name">ATP (Energy)</span>
-                        <span class="resource-amount" id="atp">100</span>
+                        <div class="resource-name">ATP</div>
+                        <div class="resource-amount" id="atp">1,000</div>
+                        <div class="resource-rate">+5/sec</div>
                     </div>
                     <div class="resource">
-                        <span class="resource-name">Glucose</span>
-                        <span class="resource-amount" id="glucose">50</span>
+                        <div class="resource-name">Glucose</div>
+                        <div class="resource-amount" id="glucose">500</div>
+                        <div class="resource-rate">+3/sec</div>
                     </div>
                     <div class="resource">
-                        <span class="resource-name">Amino Acids</span>
-                        <span class="resource-amount" id="amino-acids">25</span>
+                        <div class="resource-name">Amino Acids</div>
+                        <div class="resource-amount" id="aminoAcids">200</div>
+                        <div class="resource-rate">+1/sec</div>
                     </div>
                     <div class="resource">
-                        <span class="resource-name">Lipids</span>
-                        <span class="resource-amount" id="lipids">10</span>
+                        <div class="resource-name">Lipids</div>
+                        <div class="resource-amount" id="lipids">150</div>
+                        <div class="resource-rate">+0.8/sec</div>
                     </div>
                     <div class="resource">
-                        <span class="resource-name">Nucleotides</span>
-                        <span class="resource-amount" id="nucleotides">5</span>
+                        <div class="resource-name">Nucleotides</div>
+                        <div class="resource-amount" id="nucleotides">100</div>
+                        <div class="resource-rate">+0.5/sec</div>
+                    </div>
+                    <div class="resource">
+                        <div class="resource-name">Enzymes</div>
+                        <div class="resource-amount" id="enzymes">50</div>
+                        <div class="resource-rate">+0.2/sec</div>
+                    </div>
+                    <div class="resource evolution-resource">
+                        <div class="resource-name">Evolution Points</div>
+                        <div class="resource-amount" id="evolutionPoints">0</div>
+                        <div class="resource-rate">+0/sec</div>
                     </div>
                 </div>
                 
-                <div class="action-panel">
-                    <h3>Cell Actions</h3>
-                    <div class="action-grid">
-                        <button class="action-btn" id="absorb-btn">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>Absorb Nutrients</span>
-                            <div class="action-cost">Cost: 5 ATP</div>
-                            <div class="action-reward">Gain: Various Nutrients</div>
-                        </button>
-                        <button class="action-btn" id="metabolize-btn">
-                            <i class="fas fa-bolt"></i>
-                            <span>Metabolize Glucose</span>
-                            <div class="action-cost">Cost: 10 Glucose</div>
-                            <div class="action-reward">Gain: 20 ATP</div>
-                        </button>
-                        <button class="action-btn" id="synthesize-btn">
-                            <i class="fas fa-dna"></i>
-                            <span>Synthesize Proteins</span>
-                            <div class="action-cost">Cost: 5 Amino Acids</div>
-                            <div class="action-reward">Gain: 1 Enzyme</div>
-                        </button>
-                        <button class="action-btn" id="replicate-btn">
-                            <i class="fas fa-copy"></i>
-                            <span>Replicate DNA</span>
-                            <div class="action-cost">Cost: 10 Nucleotides</div>
-                            <div class="action-reward">Gain: Division Progress</div>
-                        </button>
-                        <button class="action-btn" id="repair-btn">
-                            <i class="fas fa-band-aid"></i>
-                            <span>Repair Cell</span>
-                            <div class="action-cost">Cost: 20 ATP, 10 Amino Acids</div>
-                            <div class="action-reward">Gain: 30 Health</div>
-                        </button>
-                        <button class="action-btn" id="defend-btn">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Defend Cell</span>
-                            <div class="action-cost">Cost: 15 ATP</div>
-                            <div class="action-reward">Gain: Temporary Protection</div>
-                        </button>
+                <div class="tabs">
+                    <div class="tab active" data-tab="cells">
+                        <i class="fas fa-circle"></i> Cells
+                    </div>
+                    <div class="tab" data-tab="storage">
+                        <i class="fas fa-box"></i> Cell Storage
+                    </div>
+                    <div class="tab" data-tab="organelles">
+                        <i class="fas fa-microscope"></i> Organelles
+                    </div>
+                    <div class="tab" data-tab="organisms">
+                        <i class="fas fa-frog"></i> Organisms
+                    </div>
+                    <div class="tab" data-tab="ecosystem">
+                        <i class="fas fa-seedling"></i> Ecosystem
+                    </div>
+                    <div class="tab" data-tab="evolution">
+                        <i class="fas fa-dna"></i> Evolution
+                    </div>
+                    <div class="tab" data-tab="research">
+                        <i class="fas fa-flask"></i> Research
+                    </div>
+                    <div class="tab" data-tab="achievements">
+                        <i class="fas fa-trophy"></i> Achievements
                     </div>
                 </div>
                 
-                <div class="organelle-panel">
-                    <h3>Organelles</h3>
-                    <div class="organelle-list" id="organelle-list">
-                        <!-- Organelles will be populated by JavaScript -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="cells">
+                        <div class="cellular-grid">
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon glow" style="background: var(--membrane-green); color: white;">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="cellular-name">Prokaryote</div>
+                                </div>
+                                <div class="cellular-description">
+                                    A simple cell without a nucleus. The basic building block of life.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>500</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Lipids:</span>
+                                        <span>100</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="prokaryote">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon glow" style="background: var(--dna-blue); color: white;">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="cellular-name">Eukaryote</div>
+                                </div>
+                                <div class="cellular-description">
+                                    A complex cell with a nucleus and organelles. More efficient and versatile.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>2,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Lipids:</span>
+                                        <span>500</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Nucleotides:</span>
+                                        <span>200</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="eukaryote">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon glow" style="background: var(--mitochondria-purple); color: white;">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="cellular-name">Specialized Cell</div>
+                                </div>
+                                <div class="cellular-description">
+                                    A cell adapted for specific functions. Can be upgraded with specialized organelles.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>5,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Amino Acids:</span>
+                                        <span>1,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>100</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="specialized">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon glow" style="background: var(--enzyme-red); color: white;">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="cellular-name">Stem Cell</div>
+                                </div>
+                                <div class="cellular-description">
+                                    A versatile cell that can differentiate into various cell types. Generates evolution points.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>10,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Nucleotides:</span>
+                                        <span>2,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Evolution Points:</span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="stem">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="evolution-panel">
-                    <h3>Evolution Paths</h3>
-                    <div class="evolution-options">
-                        <div class="evolution-option" data-evolution="prokaryote">
-                            <div class="evolution-name">Prokaryote</div>
-                            <div class="evolution-desc">Basic cell with membrane</div>
-                            <div class="evolution-cost">Requires: 100 ATP, 50 Nucleotides</div>
+                    
+                    <div class="tab-pane" id="storage">
+                        <h3>Cell Storage</h3>
+                        <div class="stat">
+                            <span>Storage Slots:</span>
+                            <span id="storage-slots">0 / 5</span>
                         </div>
-                        <div class="evolution-option disabled" data-evolution="eukaryote">
-                            <div class="evolution-name">Eukaryote</div>
-                            <div class="evolution-desc">Cell with nucleus and organelles</div>
-                            <div class="evolution-cost">Requires: 200 ATP, 100 Nucleotides</div>
+                        
+                        <div class="cell-storage" id="cell-storage">
+                            <!-- Cell slots will be populated by JavaScript -->
                         </div>
-                        <div class="evolution-option disabled" data-evolution="multicellular">
-                            <div class="evolution-name">Multicellular</div>
-                            <div class="evolution-desc">Cell colony formation</div>
-                            <div class="evolution-cost">Requires: 500 ATP, 200 Nucleotides</div>
+                        
+                        <div class="storage-upgrade">
+                            <div class="storage-upgrade-info">
+                                <div class="storage-upgrade-name">Expand Storage</div>
+                                <div class="storage-upgrade-description">Increase your cell storage capacity by 5 slots</div>
+                            </div>
+                            <div class="cellular-cost">
+                                <div class="cost-item">
+                                    <span>ATP:</span>
+                                    <span>1,000</span>
+                                </div>
+                                <div class="cost-item">
+                                    <span>Lipids:</span>
+                                    <span>500</span>
+                                </div>
+                            </div>
+                            <button class="btn" id="expand-storage-btn">
+                                <i class="fas fa-expand-arrows-alt"></i> Expand
+                            </button>
                         </div>
-                        <div class="evolution-option disabled" data-evolution="specialized">
-                            <div class="evolution-name">Specialized</div>
-                            <div class="evolution-desc">Cell differentiation</div>
-                            <div class="evolution-cost">Requires: 1000 ATP, 500 Nucleotides</div>
+                        
+                        <div class="cell-details" id="cell-details" style="display: none;">
+                            <!-- Cell details will be populated when a cell is selected -->
                         </div>
                     </div>
-                </div>
-                
-                <div class="research-panel">
-                    <h3>Research</h3>
-                    <div class="research-list">
-                        <div class="research-item">
-                            <div class="research-icon">
-                                <i class="fas fa-dna"></i>
+                    
+                    <div class="tab-pane" id="organelles">
+                        <div class="cellular-grid">
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: var(--mitochondria-purple); color: white;">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div class="cellular-name">Mitochondria</div>
+                                </div>
+                                <div class="cellular-description">
+                                    The powerhouse of the cell. Generates ATP through cellular respiration.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>200</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Glucose:</span>
+                                        <span>100</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="mitochondria">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
                             </div>
-                            <div class="research-info">
-                                <div class="research-name">DNA Replication</div>
-                                <div class="research-description">Improves cell division efficiency</div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: var(--dna-blue); color: white;">
+                                        <i class="fas fa-dna"></i>
+                                    </div>
+                                    <div class="cellular-name">Nucleus</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Contains genetic material. Enables more complex cellular functions and division.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Nucleotides:</span>
+                                        <span>500</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>200</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="nucleus">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
                             </div>
-                            <button class="research-btn" data-research="dna-replication">Research</button>
-                        </div>
-                        <div class="research-item">
-                            <div class="research-icon">
-                                <i class="fas fa-bolt"></i>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: var(--protein-orange); color: white;">
+                                        <i class="fas fa-industry"></i>
+                                    </div>
+                                    <div class="cellular-name">Ribosome</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Protein synthesis machinery. Converts mRNA into functional proteins.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Amino Acids:</span>
+                                        <span>300</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>150</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="ribosome">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
                             </div>
-                            <div class="research-info">
-                                <div class="research-name">ATP Synthesis</div>
-                                <div class="research-description">Increases energy production</div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: var(--enzyme-red); color: white;">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <div class="cellular-name">Golgi Apparatus</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Modifies, sorts, and packages proteins for secretion. Generates enzymes.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>800</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Amino Acids:</span>
+                                        <span>500</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="golgi">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
                             </div>
-                            <button class="research-btn" data-research="atp-synthesis">Research</button>
-                        </div>
-                        <div class="research-item">
-                            <div class="research-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="research-info">
-                                <div class="research-name">Membrane Strength</div>
-                                <div class="research-description">Improves cell durability</div>
-                            </div>
-                            <button class="research-btn" data-research="membrane-strength">Research</button>
                         </div>
                     </div>
-                </div>
-                
-                <div class="environment-panel">
-                    <h3>Environment</h3>
-                    <div class="environment-info">
-                        <div class="environment-stat">
-                            <span class="environment-name">Temperature</span>
-                            <span class="environment-value" id="temperature">37°C</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">pH Level</span>
-                            <span class="environment-value" id="ph-level">7.2</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">Nutrient Density</span>
-                            <span class="environment-value" id="nutrient-density">Medium</span>
-                        </div>
-                        <div class="environment-stat">
-                            <span class="environment-name">Oxygen Level</span>
-                            <span class="environment-value" id="oxygen-level">Normal</span>
+                    
+                    <div class="tab-pane" id="organisms">
+                        <div class="cellular-grid">
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: #4caf50; color: white;">
+                                        <i class="fas fa-leaf"></i>
+                                    </div>
+                                    <div class="cellular-name">Algae</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Simple photosynthetic organisms. Generate glucose from sunlight.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>2,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Lipids:</span>
+                                        <span>1,000</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="algae">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: #8bc34a; color: white;">
+                                        <i class="fas fa-worm"></i>
+                                    </div>
+                                    <div class="cellular-name">Protozoa</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Single-celled organisms that consume other cells. Generate amino acids.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>5,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>200</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="protozoa">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: #795548; color: white;">
+                                        <i class="fas fa-seedling"></i>
+                                    </div>
+                                    <div class="cellular-name">Fungus</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Decomposers that break down organic matter. Generate various resources.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>10,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Glucose:</span>
+                                        <span>5,000</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="fungus">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
+                            
+                            <div class="cellular-item">
+                                <div class="cellular-header">
+                                    <div class="cellular-icon" style="background: #ff9800; color: white;">
+                                        <i class="fas fa-fish"></i>
+                                    </div>
+                                    <div class="cellular-name">Multicellular Organism</div>
+                                </div>
+                                <div class="cellular-description">
+                                    Complex life forms with specialized tissues. Generate evolution points.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Evolution Points:</span>
+                                        <span>100</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>50,000</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Amino Acids:</span>
+                                        <span>10,000</span>
+                                    </div>
+                                </div>
+                                <button class="btn create-btn" data-cellular="multicellular">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="events-panel">
-                    <h3>Cell Events</h3>
-                    <div class="events-list" id="events-list">
-                        <div class="event">
-                            <div class="event-time">Just now</div>
-                            <div>Cell created. Begin by absorbing nutrients.</div>
+                    
+                    <div class="tab-pane" id="ecosystem">
+                        <div class="ecosystem-map" id="ecosystem-map">
+                            <!-- Ecosystem map will be generated with JavaScript -->
+                        </div>
+                        <div class="evolution-panel">
+                            <h3>Selected Biological Entity</h3>
+                            <div id="selected-entity-info">No entity selected</div>
+                            <div class="evolution-options" id="evolution-options">
+                                <!-- Evolution options will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="evolution">
+                        <h3>Biological Evolution</h3>
+                        <p>Evolve your biological entities into more advanced forms with enhanced capabilities.</p>
+                        
+                        <div class="evolution-panel">
+                            <h4>Cell Evolution Paths</h4>
+                            <div class="evolution-options">
+                                <div class="evolution-option" data-evolution="prokaryote_to_eukaryote">
+                                    <div class="cellular-name">Prokaryote → Eukaryote</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>5,000</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>Nucleotides:</span>
+                                            <span>2,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="evolution-option" data-evolution="eukaryote_to_specialized">
+                                    <div class="cellular-name">Eukaryote → Specialized Cell</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>15,000</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>Enzymes:</span>
+                                            <span>500</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="evolution-option" data-evolution="specialized_to_stem">
+                                    <div class="cellular-name">Specialized → Stem Cell</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>Evolution Points:</span>
+                                            <span>50</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>50,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="evolution-panel">
+                            <h4>Organism Evolution Paths</h4>
+                            <div class="evolution-options">
+                                <div class="evolution-option" data-evolution="algae_to_protozoa">
+                                    <div class="cellular-name">Algae → Protozoa</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>10,000</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>Amino Acids:</span>
+                                            <span>5,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="evolution-option" data-evolution="protozoa_to_fungus">
+                                    <div class="cellular-name">Protozoa → Fungus</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>25,000</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>Evolution Points:</span>
+                                            <span>25</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="evolution-option" data-evolution="fungus_to_multicellular">
+                                    <div class="cellular-name">Fungus → Multicellular</div>
+                                    <div class="cellular-cost">
+                                        <div class="cost-item">
+                                            <span>Evolution Points:</span>
+                                            <span>100</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>ATP:</span>
+                                            <span>100,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="research">
+                        <div class="research-grid">
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div class="research-name">ATP Synthesis</div>
+                                </div>
+                                <div class="research-description">
+                                    Increase ATP production efficiency by 25% for all cells.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>100</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="atp">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                            
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-dna"></i>
+                                    </div>
+                                    <div class="research-name">Gene Expression</div>
+                                </div>
+                                <div class="research-description">
+                                    Unlocks the ability to create specialized cells with unique functions.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Nucleotides:</span>
+                                        <span>150</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>50</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="gene">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                            
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-divide"></i>
+                                    </div>
+                                    <div class="research-name">Cell Division</div>
+                                </div>
+                                <div class="research-description">
+                                    Reduces the resource cost of creating cells by 20%.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>ATP:</span>
+                                        <span>200</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Lipids:</span>
+                                        <span>100</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="division">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                            
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-recycle"></i>
+                                    </div>
+                                    <div class="research-name">Metabolic Recycling</div>
+                                </div>
+                                <div class="research-description">
+                                    Gain resources when cells reach the end of their lifecycles.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>300</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Amino Acids:</span>
+                                        <span>150</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="recycling">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                            
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                    </div>
+                                    <div class="research-name">Evolution Acceleration</div>
+                                </div>
+                                <div class="research-description">
+                                    Increases production of all resources by 15%.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Evolution Points:</span>
+                                        <span>200</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>1,000</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="acceleration">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                            
+                            <div class="research">
+                                <div class="research-header">
+                                    <div class="research-icon">
+                                        <i class="fas fa-infinity"></i>
+                                    </div>
+                                    <div class="research-name">Symbiotic Relationships</div>
+                                </div>
+                                <div class="research-description">
+                                    Unlocks the ability to create complex ecosystems with multiple species.
+                                </div>
+                                <div class="cellular-cost">
+                                    <div class="cost-item">
+                                        <span>Evolution Points:</span>
+                                        <span>500</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Enzymes:</span>
+                                        <span>5,000</span>
+                                    </div>
+                                </div>
+                                <button class="btn research-btn" data-research="symbiosis">
+                                    <i class="fas fa-flask"></i> Research
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="achievements">
+                        <div class="achievements">
+                            <div class="achievement" id="achievement-1">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-circle"></i>
+                                </div>
+                                <div class="achievement-name">First Cell</div>
+                                <div class="achievement-desc">Create your first cell</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-2">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-dna"></i>
+                                </div>
+                                <div class="achievement-name">Cellular Colony</div>
+                                <div class="achievement-desc">Create 10 cells</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-3">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="achievement-name">Organelle Architect</div>
+                                <div class="achievement-desc">Create 5 organelles</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-4">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-frog"></i>
+                                </div>
+                                <div class="achievement-name">Simple Organism</div>
+                                <div class="achievement-desc">Create a cell with 3 organelles</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-5">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-infinity"></i>
+                                </div>
+                                <div class="achievement-name">Biological Master</div>
+                                <div class="achievement-desc">Create one of each biological entity</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-6">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-atom"></i>
+                                </div>
+                                <div class="achievement-name">Evolution Pioneer</div>
+                                <div class="achievement-desc">Accumulate 1,000 evolution points</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-7">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <div class="achievement-name">Ecosystem Engineer</div>
+                                <div class="achievement-desc">Create your first multicellular organism</div>
+                            </div>
+                            
+                            <div class="achievement" id="achievement-8">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-infinity"></i>
+                                </div>
+                                <div class="achievement-name">Symbiosis Expert</div>
+                                <div class="achievement-desc">Create a complex ecosystem</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="cell-view">
-                <div class="cell-stats">
-                    <div class="stat-card">
-                        <div class="stat-name">Cell Health</div>
-                        <div class="stat-value" id="cell-health">100%</div>
+            <div class="sidebar">
+                <div class="organism-view">
+                    <div class="organism-display" id="organism-display" style="background: radial-gradient(circle at 30% 30%, var(--membrane-green), #1a936f, #0a5c36); box-shadow: 0 0 50px var(--membrane-green);">
+                        <!-- The currently selected biological entity will be displayed here -->
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-name">Cell Age</div>
-                        <div class="stat-value" id="cell-age">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-name">Division Readiness</div>
-                        <div class="stat-value" id="division-readiness">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-name">Evolution Stage</div>
-                        <div class="stat-value" id="evolution-stage">Prokaryote</div>
+                    <div class="organism-info">
+                        <div class="organism-title" id="display-title">Prokaryote</div>
+                        <div class="organism-stats" id="display-stats">Size: 1-5μm | Reproduction: Binary Fission</div>
                     </div>
                 </div>
                 
-                <div class="cell-canvas-container">
-                    <canvas id="cellCanvas"></canvas>
+                <div class="events">
+                    <h3>Biological Events</h3>
+                    <div id="events-list">
+                        <div class="event">
+                            <div class="event-time">Just now</div>
+                            <div>Welcome to BioGenesis! Begin by creating your first cell.</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="cell-controls">
-                    <button class="control-btn" id="divide-btn" disabled>
-                        <i class="fas fa-divide"></i> Cell Division
-                    </button>
-                    <button class="control-btn" id="evolve-btn" disabled>
-                        <i class="fas fa-atom"></i> Evolve Cell
-                    </button>
+                <div class="stats">
+                    <h3>Biological Statistics</h3>
+                    <div class="stat">
+                        <span>Cells Created:</span>
+                        <span id="stat-cells">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Organelles Created:</span>
+                        <span id="stat-organelles">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Organisms Created:</span>
+                        <span id="stat-organisms">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Evolutions Completed:</span>
+                        <span id="stat-evolutions">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Research Completed:</span>
+                        <span id="stat-research">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Game Time:</span>
+                        <span id="stat-time">0:00</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="notification" id="notification">
-        <i class="fas fa-dna"></i>
+        <i class="fas fa-circle"></i>
         <div id="notification-text">Notification</div>
     </div>
 
     <script>
-        // Game state
+        // Complete game state with all features
         const gameState = {
             resources: {
-                atp: 100,
-                glucose: 50,
-                aminoAcids: 25,
-                lipids: 10,
-                nucleotides: 5,
-                enzymes: 0
+                atp: 1000,
+                glucose: 500,
+                aminoAcids: 200,
+                lipids: 150,
+                nucleotides: 100,
+                enzymes: 50,
+                evolutionPoints: 0
             },
-            organelles: {
-                membrane: { level: 1, health: 100 },
-                cytoplasm: { level: 1, health: 100 },
-                ribosomes: { level: 0, health: 0 },
-                mitochondria: { level: 0, health: 0 },
-                nucleus: { level: 0, health: 0 },
-                chloroplasts: { level: 0, health: 0 },
-                golgi: { level: 0, health: 0 },
-                lysosomes: { level: 0, health: 0 }
+            storage: {
+                slots: 5,
+                used: 0,
+                cells: [] // Array of cell objects
             },
-            evolution: {
-                stage: 'prokaryote',
-                progress: 0,
-                nextStage: 'eukaryote'
+            biologicalEntities: {
+                organelles: {
+                    mitochondria: { count: 0, production: { atp: 5 } },
+                    nucleus: { count: 0, production: { nucleotides: 1 } },
+                    ribosome: { count: 0, production: { aminoAcids: 2 } },
+                    golgi: { count: 0, production: { enzymes: 1 } }
+                },
+                organisms: {
+                    algae: { count: 0, production: { glucose: 10 } },
+                    protozoa: { count: 0, production: { aminoAcids: 5 } },
+                    fungus: { count: 0, production: { atp: 15, enzymes: 2 } },
+                    multicellular: { count: 0, production: { evolutionPoints: 1 } }
+                }
             },
             research: {
-                'dna-replication': false,
-                'atp-synthesis': false,
-                'membrane-strength': false
+                atp: false,
+                gene: false,
+                division: false,
+                recycling: false,
+                acceleration: false,
+                symbiosis: false
             },
-            cell: {
-                health: 100,
-                age: 0,
-                divisionProgress: 0,
-                size: 1.0,
-                defense: 0
+            stats: {
+                cells: 0,
+                organelles: 0,
+                organisms: 0,
+                evolutions: 0,
+                research: 0,
+                startTime: Date.now()
             },
-            environment: {
-                temperature: 37,
-                pH: 7.2,
-                nutrientDensity: 'medium',
-                oxygenLevel: 'normal'
+            achievements: {
+                firstCell: false,
+                cellularColony: false,
+                organelleArchitect: false,
+                simpleOrganism: false,
+                biologicalMaster: false,
+                evolutionPioneer: false,
+                ecosystemEngineer: false,
+                symbiosisExpert: false
             },
-            events: []
+            productionRates: {
+                atp: 5,
+                glucose: 3,
+                aminoAcids: 1,
+                lipids: 0.8,
+                nucleotides: 0.5,
+                enzymes: 0.2,
+                evolutionPoints: 0
+            },
+            selectedCell: null,
+            // Ecosystem data
+            ecosystem: {
+                cells: [],
+                organelles: [],
+                organisms: []
+            }
         };
 
-        // Canvas and rendering variables
-        let canvas, ctx;
-        let cellX, cellY, cellRadius;
-        let nutrients = [];
-        let threats = [];
+        // Cell data with individual upgrades
+        const cellData = {
+            prokaryote: {
+                name: "Prokaryote",
+                cost: { atp: 500, lipids: 100 },
+                baseProduction: { atp: 2 },
+                baseStats: {
+                    size: "1-5μm",
+                    reproduction: "Binary Fission",
+                    complexity: "Simple",
+                    lifespan: "24 hours"
+                },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--membrane-green), #1a936f, #0a5c36)",
+                    shadow: "var(--membrane-green)"
+                },
+                upgrades: [
+                    {
+                        id: "prokaryote_1",
+                        name: "Cell Wall Reinforcement",
+                        description: "Increases ATP production by 50%",
+                        cost: { atp: 1000 },
+                        effect: { atpMultiplier: 1.5 }
+                    },
+                    {
+                        id: "prokaryote_2",
+                        name: "Metabolic Efficiency",
+                        description: "Reduces ATP consumption by 20%",
+                        cost: { glucose: 2000 },
+                        effect: { efficiency: 1.2 }
+                    },
+                    {
+                        id: "prokaryote_3",
+                        name: "Flagellum Development",
+                        description: "Allows the cell to move and find nutrients more efficiently",
+                        cost: { aminoAcids: 100, lipids: 500 },
+                        effect: { addProduction: { glucose: 2 } }
+                    }
+                ]
+            },
+            eukaryote: {
+                name: "Eukaryote",
+                cost: { atp: 2000, lipids: 500, nucleotides: 200 },
+                baseProduction: { atp: 10, nucleotides: 1 },
+                baseStats: {
+                    size: "10-100μm",
+                    reproduction: "Mitosis",
+                    complexity: "Complex",
+                    lifespan: "1 week"
+                },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--dna-blue), #2563eb, #1e40af)",
+                    shadow: "var(--dna-blue)"
+                },
+                upgrades: [
+                    {
+                        id: "eukaryote_1",
+                        name: "Nuclear Membrane",
+                        description: "Increases nucleotide production by 25%",
+                        cost: { nucleotides: 1000 },
+                        effect: { nucleotideMultiplier: 1.25 }
+                    },
+                    {
+                        id: "eukaryote_2",
+                        name: "Cytoskeleton Development",
+                        description: "Increases ATP production during cell division",
+                        cost: { atp: 5000 },
+                        effect: { atpMultiplier: 1.3 }
+                    },
+                    {
+                        id: "eukaryote_3",
+                        name: "Endoplasmic Reticulum",
+                        description: "Allows production of additional amino acids",
+                        cost: { aminoAcids: 300, lipids: 1000 },
+                        effect: { addProduction: { aminoAcids: 3 } }
+                    }
+                ]
+            },
+            specialized: {
+                name: "Specialized Cell",
+                cost: { atp: 5000, aminoAcids: 1000, enzymes: 100 },
+                baseProduction: { atp: 20, enzymes: 1 },
+                baseStats: {
+                    size: "Varies",
+                    reproduction: "Controlled Division",
+                    complexity: "Specialized",
+                    lifespan: "Varies"
+                },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--mitochondria-purple), #7c3aed, #5b21b6)",
+                    shadow: "var(--mitochondria-purple)"
+                },
+                upgrades: [
+                    {
+                        id: "specialized_1",
+                        name: "Differentiation Control",
+                        description: "Reduces the risk of uncontrolled division",
+                        cost: { enzymes: 500 },
+                        effect: { stability: 1.5 }
+                    },
+                    {
+                        id: "specialized_2",
+                        name: "Specialized Metabolism",
+                        description: "Increases enzyme production by 50%",
+                        cost: { enzymes: 3000 },
+                        effect: { enzymeMultiplier: 1.5 }
+                    },
+                    {
+                        id: "specialized_3",
+                        name: "Intercellular Communication",
+                        description: "Allows coordination with other cells",
+                        cost: { aminoAcids: 500, atp: 10000 },
+                        effect: { addProduction: { atp: 5 } }
+                    }
+                ]
+            },
+            stem: {
+                name: "Stem Cell",
+                cost: { atp: 10000, nucleotides: 2000, evolutionPoints: 10 },
+                baseProduction: { evolutionPoints: 0.5 },
+                baseStats: {
+                    size: "10-15μm",
+                    reproduction: "Asymmetric Division",
+                    complexity: "Pluripotent",
+                    lifespan: "Indefinite (with proper conditions)"
+                },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--enzyme-red), #dc2626, #991b1b)",
+                    shadow: "var(--enzyme-red)"
+                },
+                upgrades: [
+                    {
+                        id: "stem_1",
+                        name: "Pluripotency Enhancement",
+                        description: "Increases evolution point production by 50%",
+                        cost: { evolutionPoints: 1000 },
+                        effect: { evolutionMultiplier: 1.5 }
+                    },
+                    {
+                        id: "stem_2",
+                        name: "Telomerase Activation",
+                        description: "Allows indefinite cell division",
+                        cost: { nucleotides: 10000 },
+                        effect: { immortality: true }
+                    },
+                    {
+                        id: "stem_3",
+                        name: "Differentiation Control",
+                        description: "Allows precise control over cell specialization",
+                        cost: { evolutionPoints: 500, enzymes: 5000 },
+                        effect: { specializationControl: true }
+                    }
+                ]
+            }
+        };
+
+        // Organelle and organism data
+        const biologicalData = {
+            mitochondria: {
+                name: "Mitochondria",
+                cost: { atp: 200, glucose: 100 },
+                production: { atp: 5 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--mitochondria-purple), #7c3aed, #5b21b6)",
+                    shadow: "var(--mitochondria-purple)"
+                },
+                stats: "Function: ATP Production | Structure: Double Membrane"
+            },
+            nucleus: {
+                name: "Nucleus",
+                cost: { nucleotides: 500, atp: 200 },
+                production: { nucleotides: 1 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--dna-blue), #2563eb, #1e40af)",
+                    shadow: "var(--dna-blue)"
+                },
+                stats: "Function: Genetic Storage | Contains: DNA"
+            },
+            ribosome: {
+                name: "Ribosome",
+                cost: { aminoAcids: 300, atp: 150 },
+                production: { aminoAcids: 2 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--protein-orange), #f59e0b, #d97706)",
+                    shadow: "var(--protein-orange)"
+                },
+                stats: "Function: Protein Synthesis | Location: Cytoplasm/ER"
+            },
+            golgi: {
+                name: "Golgi Apparatus",
+                cost: { atp: 800, aminoAcids: 500 },
+                production: { enzymes: 1 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, var(--enzyme-red), #dc2626, #991b1b)",
+                    shadow: "var(--enzyme-red)"
+                },
+                stats: "Function: Protein Modification | Structure: Membrane Stacks"
+            },
+            algae: {
+                name: "Algae",
+                cost: { atp: 2000, lipids: 1000 },
+                production: { glucose: 10 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, #4caf50, #388e3c, #2e7d32)",
+                    shadow: "#388e3c"
+                },
+                stats: "Type: Photosynthetic | Habitat: Aquatic"
+            },
+            protozoa: {
+                name: "Protozoa",
+                cost: { atp: 5000, enzymes: 200 },
+                production: { aminoAcids: 5 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, #8bc34a, #689f38, #558b2f)",
+                    shadow: "#689f38"
+                },
+                stats: "Type: Heterotrophic | Movement: Flagella/Cilia"
+            },
+            fungus: {
+                name: "Fungus",
+                cost: { atp: 10000, glucose: 5000 },
+                production: { atp: 15, enzymes: 2 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, #795548, #6d4c41, #5d4037)",
+                    shadow: "#6d4c41"
+                },
+                stats: "Type: Decomposer | Structure: Hyphae/Mycelium"
+            },
+            multicellular: {
+                name: "Multicellular Organism",
+                cost: { evolutionPoints: 100, atp: 50000, aminoAcids: 10000 },
+                production: { evolutionPoints: 1 },
+                display: {
+                    background: "radial-gradient(circle at 30% 30%, #ff9800, #f57c00, #ef6c00)",
+                    shadow: "#f57c00"
+                },
+                stats: "Complexity: High | Specialization: Tissue/Organs"
+            }
+        };
+
+        // Evolution data
+        const evolutionData = {
+            prokaryote_to_eukaryote: {
+                from: "prokaryote",
+                to: "eukaryote",
+                cost: { atp: 5000, nucleotides: 2000 }
+            },
+            eukaryote_to_specialized: {
+                from: "eukaryote",
+                to: "specialized",
+                cost: { atp: 15000, enzymes: 500 }
+            },
+            specialized_to_stem: {
+                from: "specialized",
+                to: "stem",
+                cost: { evolutionPoints: 50, atp: 50000 }
+            },
+            algae_to_protozoa: {
+                from: "algae",
+                to: "protozoa",
+                cost: { atp: 10000, aminoAcids: 5000 }
+            },
+            protozoa_to_fungus: {
+                from: "protozoa",
+                to: "fungus",
+                cost: { atp: 25000, evolutionPoints: 25 }
+            },
+            fungus_to_multicellular: {
+                from: "fungus",
+                to: "multicellular",
+                cost: { evolutionPoints: 100, atp: 100000 }
+            }
+        };
+
+        // Research data
+        const researchData = {
+            atp: {
+                name: "ATP Synthesis",
+                cost: { enzymes: 100 },
+                effect: "atpProduction"
+            },
+            gene: {
+                name: "Gene Expression",
+                cost: { nucleotides: 150, enzymes: 50 },
+                effect: "specializedCells"
+            },
+            division: {
+                name: "Cell Division",
+                cost: { atp: 200, lipids: 100 },
+                effect: "cellCostReduction"
+            },
+            recycling: {
+                name: "Metabolic Recycling",
+                cost: { enzymes: 300, aminoAcids: 150 },
+                effect: "cellEndOfLife"
+            },
+            acceleration: {
+                name: "Evolution Acceleration",
+                cost: { evolutionPoints: 200, enzymes: 1000 },
+                effect: "globalProductionBoost"
+            },
+            symbiosis: {
+                name: "Symbiotic Relationships",
+                cost: { evolutionPoints: 500, enzymes: 5000 },
+                effect: "unlockEcosystems"
+            }
+        };
+
+        // Performance optimization variables
         let lastUpdateTime = 0;
+        const UPDATE_INTERVAL = 1000; // Update resources once per second
         let animationFrameId = null;
 
-        // Initialize the game
-        function init() {
-            // Set up canvas
-            canvas = document.getElementById('cellCanvas');
-            ctx = canvas.getContext('2d');
-            
-            // Set canvas size
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            
-            // Initialize cell position
-            cellX = canvas.width / 2;
-            cellY = canvas.height / 2;
-            cellRadius = 50;
-            
-            // Generate initial nutrients
-            generateNutrients(10);
+        // Game initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved game if available
+            loadGame();
             
             // Set up event listeners
             setupEventListeners();
             
-            // Start game loop
+            // Start optimized game loop
             startGameLoop();
             
             // Update UI
             updateUI();
             
-            // Add initial event
-            addEvent("Cell created. Begin by absorbing nutrients.");
-        }
-
-        // Set up canvas size
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
+            // Render cell storage
+            renderCellStorage();
             
-            // Update cell position to center
-            cellX = canvas.width / 2;
-            cellY = canvas.height / 2;
-        }
+            // Add initial event
+            addEvent("Welcome to BioGenesis! Begin by creating your first cell.");
+            
+            // Set initial organism display
+            updateOrganismDisplay('prokaryote');
+        });
 
         // Set up event listeners
         function setupEventListeners() {
-            // Action buttons
-            document.getElementById('absorb-btn').addEventListener('click', absorbNutrients);
-            document.getElementById('metabolize-btn').addEventListener('click', metabolizeGlucose);
-            document.getElementById('synthesize-btn').addEventListener('click', synthesizeProteins);
-            document.getElementById('replicate-btn').addEventListener('click', replicateDNA);
-            document.getElementById('repair-btn').addEventListener('click', repairCell);
-            document.getElementById('defend-btn').addEventListener('click', defendCell);
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this.getAttribute('data-tab'));
+                });
+            });
             
-            // Control buttons
-            document.getElementById('divide-btn').addEventListener('click', cellDivision);
-            document.getElementById('evolve-btn').addEventListener('click', evolveCell);
+            // Quick actions
+            document.querySelectorAll('.quick-action').forEach(action => {
+                action.addEventListener('click', function() {
+                    switchTab(this.getAttribute('data-tab'));
+                });
+            });
+            
+            // Create biological entity buttons
+            document.querySelectorAll('.create-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const cellular = this.getAttribute('data-cellular');
+                    if (cellular in cellData) {
+                        createCell(cellular);
+                    } else {
+                        createBiologicalEntity(cellular);
+                    }
+                });
+            });
+            
+            // Expand storage button
+            document.getElementById('expand-storage-btn').addEventListener('click', expandStorage);
             
             // Research buttons
             document.querySelectorAll('.research-btn').forEach(button => {
@@ -942,32 +2243,84 @@
             });
             
             // Evolution options
-            document.querySelectorAll('.evolution-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    if (!this.classList.contains('disabled')) {
-                        const evolution = this.getAttribute('data-evolution');
-                        initiateEvolution(evolution);
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.evolution-option')) {
+                    const evolutionOption = e.target.closest('.evolution-option');
+                    if (!evolutionOption.classList.contains('disabled')) {
+                        const evolution = evolutionOption.getAttribute('data-evolution');
+                        evolveBiological(evolution);
                     }
-                });
+                }
             });
             
             // Save game when leaving
             window.addEventListener('beforeunload', saveGame);
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Number keys 1-8 for tabs
+                if (e.key >= '1' && e.key <= '8') {
+                    const tabs = document.querySelectorAll('.tab');
+                    const index = parseInt(e.key) - 1;
+                    if (index < tabs.length) {
+                        switchTab(tabs[index].getAttribute('data-tab'));
+                    }
+                }
+                
+                // Space bar to create selected biological entity
+                if (e.key === ' ' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                    if (activeTab === 'cells') {
+                        const firstAvailable = document.querySelector('.create-btn:not(:disabled)');
+                        if (firstAvailable) firstAvailable.click();
+                    }
+                }
+            });
         }
 
-        // Start the game loop
+        // Switch tabs
+        function switchTab(tabId) {
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            // Activate clicked tab
+            const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            if (tab) {
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Special handling for specific tabs
+                if (tabId === 'storage') {
+                    renderCellStorage();
+                } else if (tabId === 'ecosystem') {
+                    renderEcosystemMap();
+                }
+            }
+        }
+
+        // Optimized game loop using requestAnimationFrame
         function startGameLoop() {
             function gameLoop(timestamp) {
                 if (!lastUpdateTime) lastUpdateTime = timestamp;
                 
                 const elapsed = timestamp - lastUpdateTime;
                 
-                if (elapsed > 100) { // Update every 100ms for smoother animation
-                    // Update game state
-                    updateGameState(elapsed);
+                if (elapsed > UPDATE_INTERVAL) {
+                    // Update resources based on production
+                    for (const resource in gameState.productionRates) {
+                        gameState.resources[resource] += gameState.productionRates[resource];
+                    }
                     
-                    // Render the game
-                    render();
+                    // Update UI (but not every frame for performance)
+                    updateUI();
+                    
+                    // Check for achievements
+                    checkAchievements();
+                    
+                    // Update game time
+                    updateGameTime();
                     
                     lastUpdateTime = timestamp;
                 }
@@ -978,936 +2331,862 @@
             animationFrameId = requestAnimationFrame(gameLoop);
         }
 
-        // Update game state
-        function updateGameState(elapsed) {
-            // Consume ATP over time
-            gameState.resources.atp -= 0.1 * (elapsed / 1000);
-            if (gameState.resources.atp < 0) gameState.resources.atp = 0;
-            
-            // Age the cell
-            gameState.cell.age += elapsed / 10000;
-            
-            // Decrease defense over time
-            if (gameState.cell.defense > 0) {
-                gameState.cell.defense -= 0.05 * (elapsed / 1000);
-                if (gameState.cell.defense < 0) gameState.cell.defense = 0;
+        // Create a cell
+        function createCell(cellType) {
+            // Check if we have storage space
+            if (gameState.storage.used >= gameState.storage.slots) {
+                showNotification("Not enough storage space! Expand your storage or remove cells.", 'warning');
+                return;
             }
             
-            // Randomly generate nutrients
-            if (Math.random() < 0.02) {
-                generateNutrients(1);
-            }
+            const cell = cellData[cellType];
             
-            // Randomly generate threats
-            if (Math.random() < 0.005) {
-                generateThreats(1);
-            }
-            
-            // Move nutrients
-            nutrients.forEach(nutrient => {
-                // Simple movement toward cell
-                const dx = cellX - nutrient.x;
-                const dy = cellY - nutrient.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < cellRadius + 10) {
-                    // Nutrient absorbed
-                    absorbNutrient(nutrient);
-                    nutrients.splice(nutrients.indexOf(nutrient), 1);
-                } else {
-                    // Move toward cell
-                    nutrient.x += (dx / dist) * 2;
-                    nutrient.y += (dy / dist) * 2;
+            // Check if we have enough resources
+            let canAfford = true;
+            for (const resource in cell.cost) {
+                if (gameState.resources[resource] < cell.cost[resource]) {
+                    canAfford = false;
+                    break;
                 }
-            });
+            }
             
-            // Move threats
-            threats.forEach(threat => {
-                // Movement toward cell
-                const dx = cellX - threat.x;
-                const dy = cellY - threat.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < cellRadius + 10) {
-                    // Threat damages cell (reduced by defense)
-                    const actualDamage = Math.max(1, threat.damage - gameState.cell.defense);
-                    damageCell(actualDamage);
-                    threats.splice(threats.indexOf(threat), 1);
-                    addEvent(`Cell damaged by ${threat.type}! (-${actualDamage} health)`);
-                } else {
-                    // Move toward cell
-                    threat.x += (dx / dist) * threat.speed;
-                    threat.y += (dy / dist) * threat.speed;
-                }
-            });
+            if (!canAfford) {
+                showNotification(`Not enough resources to create ${cell.name}`, 'warning');
+                return;
+            }
             
-            // Update division readiness
-            updateDivisionReadiness();
+            // Deduct costs
+            for (const resource in cell.cost) {
+                gameState.resources[resource] -= cell.cost[resource];
+            }
             
-            // Update evolution progress
-            updateEvolutionProgress();
+            // Create the cell object
+            const newCell = {
+                id: Date.now(), // Unique ID
+                type: cellType,
+                name: `${cell.name} ${gameState.storage.cells.length + 1}`,
+                level: 1,
+                upgrades: [],
+                production: { ...cell.baseProduction },
+                stats: { ...cell.baseStats }
+            };
+            
+            // Add to storage
+            gameState.storage.cells.push(newCell);
+            gameState.storage.used++;
+            gameState.stats.cells++;
+            
+            // Update production rates
+            for (const resource in newCell.production) {
+                gameState.productionRates[resource] += newCell.production[resource];
+            }
+            
+            // Add event
+            addEvent(`Created a new ${cell.name}.`);
+            
+            // Show notification
+            showNotification(`Created ${cell.name}!`);
             
             // Update UI
             updateUI();
+            renderCellStorage();
+            
+            // Save game
+            saveGame();
         }
 
-        // Render the game
-        function render() {
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Create a biological entity (organelle or organism)
+        function createBiologicalEntity(entityId) {
+            const entity = biologicalData[entityId];
+            const cost = entity.cost;
             
-            // Draw background
-            drawBackground();
-            
-            // Draw nutrients
-            drawNutrients();
-            
-            // Draw threats
-            drawThreats();
-            
-            // Draw cell
-            drawCell();
-            
-            // Draw UI elements
-            drawUI();
-        }
-
-        // Draw background
-        function drawBackground() {
-            // Gradient background
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, '#0a1929');
-            gradient.addColorStop(1, '#1a2b3c');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw some background elements (bubbles, particles)
-            for (let i = 0; i < 20; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const radius = Math.random() * 3;
-                
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.fill();
-            }
-        }
-
-        // Draw the cell
-        function drawCell() {
-            // Cell membrane with defense indicator
-            ctx.beginPath();
-            ctx.arc(cellX, cellY, cellRadius, 0, Math.PI * 2);
-            
-            if (gameState.cell.defense > 0) {
-                ctx.strokeStyle = '#00bcd4';
-                ctx.lineWidth = 5;
-            } else {
-                ctx.strokeStyle = '#4caf50';
-                ctx.lineWidth = 3;
-            }
-            ctx.stroke();
-            
-            // Cytoplasm
-            ctx.beginPath();
-            ctx.arc(cellX, cellY, cellRadius - 5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 235, 59, 0.3)';
-            ctx.fill();
-            
-            // Draw organelles based on evolution stage
-            if (gameState.evolution.stage === 'prokaryote') {
-                drawProkaryoteOrganelles();
-            } else if (gameState.evolution.stage === 'eukaryote') {
-                drawEukaryoteOrganelles();
-            } else if (gameState.evolution.stage === 'multicellular') {
-                drawMulticellularStructure();
-            } else if (gameState.evolution.stage === 'specialized') {
-                drawSpecializedStructures();
-            }
-            
-            // Cell health indicator
-            const healthPercent = gameState.cell.health / 100;
-            ctx.beginPath();
-            ctx.arc(cellX, cellY, cellRadius + 10, 0, Math.PI * 2 * healthPercent);
-            ctx.strokeStyle = healthPercent > 0.7 ? '#4caf50' : healthPercent > 0.3 ? '#ff9800' : '#f44336';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-
-        // Draw prokaryote organelles
-        function drawProkaryoteOrganelles() {
-            // Ribosomes (if present)
-            if (gameState.organelles.ribosomes.level > 0) {
-                for (let i = 0; i < 5; i++) {
-                    const angle = (i / 5) * Math.PI * 2;
-                    const x = cellX + Math.cos(angle) * (cellRadius - 15);
-                    const y = cellY + Math.sin(angle) * (cellRadius - 15);
-                    
-                    ctx.beginPath();
-                    ctx.arc(x, y, 5, 0, Math.PI * 2);
-                    ctx.fillStyle = '#9c27b0';
-                    ctx.fill();
-                }
-            }
-            
-            // DNA strand
-            ctx.beginPath();
-            for (let i = 0; i < 10; i++) {
-                const x = cellX - 20 + i * 4;
-                const y = cellY + Math.sin(i * 0.5) * 5;
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.strokeStyle = '#2196f3';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-
-        // Draw eukaryote organelles
-        function drawEukaryoteOrganelles() {
-            // Nucleus
-            ctx.beginPath();
-            ctx.arc(cellX, cellY, cellRadius / 2, 0, Math.PI * 2);
-            ctx.strokeStyle = '#2196f3';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Mitochondria
-            if (gameState.organelles.mitochondria.level > 0) {
-                for (let i = 0; i < 3; i++) {
-                    const angle = (i / 3) * Math.PI * 2;
-                    const x = cellX + Math.cos(angle) * (cellRadius - 20);
-                    const y = cellY + Math.sin(angle) * (cellRadius - 20);
-                    
-                    ctx.beginPath();
-                    ctx.ellipse(x, y, 8, 5, angle, 0, Math.PI * 2);
-                    ctx.fillStyle = '#f44336';
-                    ctx.fill();
-                }
-            }
-            
-            // Other organelles would be drawn here based on what's unlocked
-        }
-
-        // Draw multicellular structure
-        function drawMulticellularStructure() {
-            // Draw multiple cells
-            for (let i = 0; i < 4; i++) {
-                const angle = (i / 4) * Math.PI * 2;
-                const x = cellX + Math.cos(angle) * (cellRadius + 10);
-                const y = cellY + Math.sin(angle) * (cellRadius + 10);
-                
-                ctx.beginPath();
-                ctx.arc(x, y, cellRadius / 2, 0, Math.PI * 2);
-                ctx.strokeStyle = '#4caf50';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.arc(x, y, cellRadius / 2 - 5, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 235, 59, 0.3)';
-                ctx.fill();
-            }
-        }
-
-        // Draw specialized structures
-        function drawSpecializedStructures() {
-            // Draw specialized cell structures
-            // This would include things like cilia, flagella, etc.
-            
-            // Flagella
-            for (let i = 0; i < 3; i++) {
-                const angle = (i / 3) * Math.PI * 2;
-                const startX = cellX + Math.cos(angle) * cellRadius;
-                const startY = cellY + Math.sin(angle) * cellRadius;
-                
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                
-                for (let j = 1; j <= 5; j++) {
-                    const segmentX = startX + Math.cos(angle) * 20 * j;
-                    const segmentY = startY + Math.sin(angle) * 20 * j;
-                    ctx.lineTo(segmentX, segmentY);
-                }
-                
-                ctx.strokeStyle = '#4caf50';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-        }
-
-        // Draw nutrients
-        function drawNutrients() {
-            nutrients.forEach(nutrient => {
-                ctx.beginPath();
-                ctx.arc(nutrient.x, nutrient.y, 5, 0, Math.PI * 2);
-                
-                switch(nutrient.type) {
-                    case 'glucose':
-                        ctx.fillStyle = '#ffeb3b';
-                        break;
-                    case 'amino-acid':
-                        ctx.fillStyle = '#2196f3';
-                        break;
-                    case 'lipid':
-                        ctx.fillStyle = '#ff9800';
-                        break;
-                    case 'nucleotide':
-                        ctx.fillStyle = '#9c27b0';
-                        break;
-                }
-                
-                ctx.fill();
-                
-                // Add a glow effect
-                ctx.beginPath();
-                ctx.arc(nutrient.x, nutrient.y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.fill();
-            });
-        }
-
-        // Draw threats
-        function drawThreats() {
-            threats.forEach(threat => {
-                ctx.beginPath();
-                
-                if (threat.type === 'virus') {
-                    // Draw virus as a spiky circle
-                    ctx.arc(threat.x, threat.y, 8, 0, Math.PI * 2);
-                    
-                    // Add spikes
-                    for (let i = 0; i < 8; i++) {
-                        const angle = (i / 8) * Math.PI * 2;
-                        const spikeX = threat.x + Math.cos(angle) * 12;
-                        const spikeY = threat.y + Math.sin(angle) * 12;
-                        
-                        ctx.moveTo(threat.x, threat.y);
-                        ctx.lineTo(spikeX, spikeY);
-                    }
-                } else if (threat.type === 'toxin') {
-                    // Draw toxin as a jagged shape
-                    ctx.moveTo(threat.x - 8, threat.y);
-                    ctx.lineTo(threat.x - 4, threat.y - 6);
-                    ctx.lineTo(threat.x, threat.y);
-                    ctx.lineTo(threat.x + 4, threat.y + 6);
-                    ctx.lineTo(threat.x + 8, threat.y);
-                    ctx.lineTo(threat.x + 4, threat.y - 6);
-                    ctx.lineTo(threat.x, threat.y);
-                    ctx.lineTo(threat.x - 4, threat.y + 6);
-                    ctx.closePath();
-                } else if (threat.type === 'bacteria') {
-                    // Draw bacteria as a rod shape
-                    ctx.ellipse(threat.x, threat.y, 12, 5, 0, 0, Math.PI * 2);
-                }
-                
-                ctx.fillStyle = threat.type === 'virus' ? '#f44336' : 
-                               threat.type === 'toxin' ? '#ff9800' : '#9c27b0';
-                ctx.fill();
-            });
-        }
-
-        // Draw UI elements on canvas
-        function drawUI() {
-            // Division progress bar
-            const progress = gameState.cell.divisionProgress / 100;
-            if (progress > 0) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(canvas.width - 210, 20, 200, 20);
-                
-                ctx.fillStyle = '#4caf50';
-                ctx.fillRect(canvas.width - 210, 20, 200 * progress, 20);
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '12px Arial';
-                ctx.fillText('Division Progress', canvas.width - 210, 15);
-            }
-            
-            // Evolution progress
-            const evolutionProgress = gameState.evolution.progress / 100;
-            if (evolutionProgress > 0) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(canvas.width - 210, 50, 200, 20);
-                
-                ctx.fillStyle = '#00bcd4';
-                ctx.fillRect(canvas.width - 210, 50, 200 * evolutionProgress, 20);
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '12px Arial';
-                ctx.fillText('Evolution Progress', canvas.width - 210, 45);
-            }
-            
-            // Defense indicator
-            if (gameState.cell.defense > 0) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(canvas.width - 210, 80, 200, 20);
-                
-                ctx.fillStyle = '#00bcd4';
-                ctx.fillRect(canvas.width - 210, 80, 200 * (gameState.cell.defense / 10), 20);
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '12px Arial';
-                ctx.fillText('Defense', canvas.width - 210, 75);
-            }
-        }
-
-        // Generate nutrients
-        function generateNutrients(count) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 200 + 300;
-                const x = cellX + Math.cos(angle) * distance;
-                const y = cellY + Math.sin(angle) * distance;
-                
-                const types = ['glucose', 'amino-acid', 'lipid', 'nucleotide'];
-                const type = types[Math.floor(Math.random() * types.length)];
-                
-                nutrients.push({ x, y, type });
-            }
-        }
-
-        // Generate threats
-        function generateThreats(count) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 200 + 300;
-                const x = cellX + Math.cos(angle) * distance;
-                const y = cellY + Math.sin(angle) * distance;
-                
-                const types = ['virus', 'toxin', 'bacteria'];
-                const type = types[Math.floor(Math.random() * types.length)];
-                
-                let damage, speed;
-                switch(type) {
-                    case 'virus':
-                        damage = 10;
-                        speed = 1.5;
-                        break;
-                    case 'toxin':
-                        damage = 5;
-                        speed = 1;
-                        break;
-                    case 'bacteria':
-                        damage = 15;
-                        speed = 0.8;
-                        break;
-                }
-                
-                threats.push({ x, y, type, damage, speed });
-            }
-        }
-
-        // Absorb nutrients
-        function absorbNutrients() {
-            // Consume ATP to absorb nutrients
-            if (gameState.resources.atp < 5) {
-                showNotification("Not enough ATP to absorb nutrients", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 5;
-            
-            // Increase resource absorption rate temporarily
-            const absorptionRate = 2;
-            
-            // Find nearby nutrients
-            const nearbyNutrients = nutrients.filter(nutrient => {
-                const dx = cellX - nutrient.x;
-                const dy = cellY - nutrient.y;
-                return Math.sqrt(dx * dx + dy * dy) < cellRadius + 50;
-            });
-            
-            // Absorb nearby nutrients
-            nearbyNutrients.forEach(nutrient => {
-                absorbNutrient(nutrient);
-                nutrients.splice(nutrients.indexOf(nutrient), 1);
-            });
-            
-            if (nearbyNutrients.length > 0) {
-                addEvent(`Absorbed ${nearbyNutrients.length} nutrients`);
-                showNotification(`Absorbed ${nearbyNutrients.length} nutrients!`);
-            } else {
-                showNotification("No nutrients nearby to absorb", 'warning');
-            }
-            
-            updateUI();
-        }
-
-        // Metabolize glucose into ATP
-        function metabolizeGlucose() {
-            if (gameState.resources.glucose < 10) {
-                showNotification("Not enough glucose to metabolize", 'warning');
-                return;
-            }
-            
-            gameState.resources.glucose -= 10;
-            gameState.resources.atp += 20;
-            
-            addEvent("Metabolized glucose into ATP");
-            showNotification("Glucose metabolized! +20 ATP");
-            updateUI();
-        }
-
-        // Synthesize proteins
-        function synthesizeProteins() {
-            if (gameState.resources.aminoAcids < 5) {
-                showNotification("Not enough amino acids to synthesize proteins", 'warning');
-                return;
-            }
-            
-            gameState.resources.aminoAcids -= 5;
-            gameState.resources.enzymes += 1;
-            
-            addEvent("Synthesized proteins into enzymes");
-            showNotification("Proteins synthesized! +1 Enzyme");
-            updateUI();
-        }
-
-        // Replicate DNA
-        function replicateDNA() {
-            if (gameState.resources.nucleotides < 10) {
-                showNotification("Not enough nucleotides to replicate DNA", 'warning');
-                return;
-            }
-            
-            gameState.resources.nucleotides -= 10;
-            gameState.cell.divisionProgress += 15;
-            if (gameState.cell.divisionProgress > 100) gameState.cell.divisionProgress = 100;
-            
-            addEvent("DNA replicated, division progress increased");
-            showNotification("DNA replicated! +15% Division Progress");
-            updateUI();
-        }
-
-        // Defend cell
-        function defendCell() {
-            if (gameState.resources.atp < 15) {
-                showNotification("Not enough ATP to defend cell", 'warning');
-                return;
-            }
-            
-            gameState.resources.atp -= 15;
-            gameState.cell.defense = 10; // Max defense value
-            
-            addEvent("Cell defense activated");
-            showNotification("Cell defense activated! Reduced damage from threats");
-            updateUI();
-        }
-
-        // Absorb a single nutrient
-        function absorbNutrient(nutrient) {
-            switch(nutrient.type) {
-                case 'glucose':
-                    gameState.resources.glucose += 10;
-                    break;
-                case 'amino-acid':
-                    gameState.resources.aminoAcids += 5;
-                    break;
-                case 'lipid':
-                    gameState.resources.lipids += 3;
-                    break;
-                case 'nucleotide':
-                    gameState.resources.nucleotides += 2;
-                    break;
-            }
-            
-            // Small chance to gain ATP from absorption
-            if (Math.random() < 0.3) {
-                gameState.resources.atp += 2;
-            }
-        }
-
-        // Damage the cell
-        function damageCell(amount) {
-            gameState.cell.health -= amount;
-            if (gameState.cell.health < 0) gameState.cell.health = 0;
-            
-            // Also damage organelles
-            for (const organelle in gameState.organelles) {
-                if (gameState.organelles[organelle].health > 0) {
-                    gameState.organelles[organelle].health -= amount / 2;
-                    if (gameState.organelles[organelle].health < 0) {
-                        gameState.organelles[organelle].health = 0;
-                    }
-                }
-            }
-            
-            updateUI();
-        }
-
-        // Repair the cell
-        function repairCell() {
             // Check if we have enough resources
-            if (gameState.resources.atp < 20 || gameState.resources.aminoAcids < 10) {
-                showNotification("Not enough resources for repair", 'warning');
-                return;
-            }
-            
-            // Consume resources
-            gameState.resources.atp -= 20;
-            gameState.resources.aminoAcids -= 10;
-            
-            // Repair cell
-            gameState.cell.health += 30;
-            if (gameState.cell.health > 100) gameState.cell.health = 100;
-            
-            // Repair organelles
-            for (const organelle in gameState.organelles) {
-                if (gameState.organelles[organelle].health > 0) {
-                    gameState.organelles[organelle].health += 15;
-                    if (gameState.organelles[organelle].health > 100) {
-                        gameState.organelles[organelle].health = 100;
-                    }
+            for (const resource in cost) {
+                if (gameState.resources[resource] < cost[resource]) {
+                    showNotification(`Not enough ${resource} to create ${entity.name}`, 'warning');
+                    return;
                 }
             }
             
-            addEvent("Cell repaired");
-            showNotification("Cell repaired! +30 Health");
+            // Deduct costs
+            for (const resource in cost) {
+                gameState.resources[resource] -= cost[resource];
+            }
+            
+            // Add biological entity
+            let type = 'organelles';
+            if (entityId in gameState.biologicalEntities.organisms) {
+                type = 'organisms';
+                gameState.stats.organisms++;
+            } else {
+                gameState.stats.organelles++;
+            }
+            
+            gameState.biologicalEntities[type][entityId].count++;
+            
+            // Update production rates
+            for (const resource in entity.production) {
+                gameState.productionRates[resource] += entity.production[resource];
+            }
+            
+            // Add to ecosystem
+            addToEcosystem(entityId, type);
+            
+            // Add event
+            addEvent(`Created a new ${entity.name}.`);
+            
+            // Show notification
+            showNotification(`Created ${entity.name}!`);
+            
+            // Update organism display
+            updateOrganismDisplay(entityId);
+            
+            // Update UI
             updateUI();
+            
+            // Save game
+            saveGame();
         }
 
-        // Update division readiness
-        function updateDivisionReadiness() {
-            // Division requires resources and health
-            const resourceReadiness = Math.min(
-                gameState.resources.atp / 50,
-                gameState.resources.glucose / 30,
-                gameState.resources.aminoAcids / 20,
-                gameState.resources.lipids / 10,
-                gameState.resources.nucleotides / 5
-            );
+        // Expand storage
+        function expandStorage() {
+            const cost = { atp: 1000, lipids: 500 };
             
-            const healthReadiness = gameState.cell.health / 100;
+            // Check if we have enough resources
+            let canAfford = true;
+            for (const resource in cost) {
+                if (gameState.resources[resource] < cost[resource]) {
+                    canAfford = false;
+                    break;
+                }
+            }
             
-            gameState.cell.divisionProgress = Math.min(resourceReadiness, healthReadiness) * 100;
-            
-            // Enable/disable division button
-            document.getElementById('divide-btn').disabled = gameState.cell.divisionProgress < 100;
-        }
-
-        // Cell division
-        function cellDivision() {
-            if (gameState.cell.divisionProgress < 100) {
-                showNotification("Cell not ready for division", 'warning');
+            if (!canAfford) {
+                showNotification("Not enough resources to expand storage", 'warning');
                 return;
             }
             
-            // Consume resources for division
-            gameState.resources.atp -= 50;
-            gameState.resources.glucose -= 30;
-            gameState.resources.aminoAcids -= 20;
-            gameState.resources.lipids -= 10;
-            gameState.resources.nucleotides -= 5;
-            
-            // Reset division progress
-            gameState.cell.divisionProgress = 0;
-            
-            // Increase cell size slightly
-            gameState.cell.size += 0.1;
-            cellRadius = 50 * gameState.cell.size;
-            
-            // Gain evolution progress
-            gameState.evolution.progress += 5;
-            if (gameState.evolution.progress > 100) gameState.evolution.progress = 100;
-            
-            addEvent("Cell division completed");
-            showNotification("Cell division completed!");
-            
-            // Check if evolution is now possible
-            if (gameState.evolution.progress >= 100) {
-                document.getElementById('evolve-btn').disabled = false;
-                showNotification("Evolution possible!", 'evolution');
+            // Deduct costs
+            for (const resource in cost) {
+                gameState.resources[resource] -= cost[resource];
             }
             
+            // Expand storage
+            gameState.storage.slots += 5;
+            
+            // Add event
+            addEvent("Expanded cell storage capacity.");
+            
+            // Show notification
+            showNotification("Storage expanded! +5 slots");
+            
+            // Update UI
             updateUI();
+            renderCellStorage();
+            
+            // Save game
+            saveGame();
         }
 
-        // Update evolution progress
-        function updateEvolutionProgress() {
-            // Evolution progress increases slowly over time
-            if (gameState.evolution.progress < 100) {
-                gameState.evolution.progress += 0.01;
-            }
+        // Render cell storage
+        function renderCellStorage() {
+            const storageContainer = document.getElementById('cell-storage');
+            storageContainer.innerHTML = '';
             
-            // Update evolution options based on current stage
-            updateEvolutionOptions();
-        }
-
-        // Update evolution options
-        function updateEvolutionOptions() {
-            const options = document.querySelectorAll('.evolution-option');
+            // Update storage info
+            document.getElementById('storage-slots').textContent = 
+                `${gameState.storage.used} / ${gameState.storage.slots}`;
             
-            options.forEach(option => {
-                const evolution = option.getAttribute('data-evolution');
+            // Render filled slots
+            gameState.storage.cells.forEach(cell => {
+                const cellType = cellData[cell.type];
+                const slot = document.createElement('div');
+                slot.className = 'storage-slot filled';
+                slot.innerHTML = `
+                    <div class="cell-in-slot">
+                        <div class="cell-slot-icon" style="background: ${cellType.display.background}; box-shadow: 0 0 10px ${cellType.display.shadow};">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <div class="cell-slot-name">${cell.name}</div>
+                        <div class="cell-slot-level">Level ${cell.level}</div>
+                    </div>
+                `;
                 
-                if (evolution === gameState.evolution.stage) {
-                    option.style.background = 'rgba(0, 188, 212, 0.2)';
-                    option.classList.add('disabled');
-                } else if (evolution === gameState.evolution.nextStage && gameState.evolution.progress >= 100) {
-                    option.classList.remove('disabled');
-                } else {
-                    option.classList.add('disabled');
-                }
+                slot.addEventListener('click', () => {
+                    selectCell(cell.id);
+                });
+                
+                storageContainer.appendChild(slot);
             });
+            
+            // Render empty slots
+            for (let i = gameState.storage.used; i < gameState.storage.slots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'storage-slot empty';
+                slot.addEventListener('click', () => {
+                    // Switch to cells tab to create a new cell
+                    switchTab('cells');
+                });
+                storageContainer.appendChild(slot);
+            }
+            
+            // Hide cell details if no cell is selected
+            if (!gameState.selectedCell) {
+                document.getElementById('cell-details').style.display = 'none';
+            }
         }
 
-        // Evolve the cell
-        function evolveCell() {
-            if (gameState.evolution.progress < 100) {
-                showNotification("Not enough evolution progress", 'warning');
+        // Select a cell for detailed view
+        function selectCell(cellId) {
+            const cell = gameState.storage.cells.find(c => c.id === cellId);
+            if (!cell) return;
+            
+            gameState.selectedCell = cell;
+            const cellType = cellData[cell.type];
+            
+            const detailsContainer = document.getElementById('cell-details');
+            detailsContainer.style.display = 'block';
+            
+            // Create cell details HTML
+            let upgradesHTML = '';
+            cellType.upgrades.forEach(upgrade => {
+                const hasUpgrade = cell.upgrades.includes(upgrade.id);
+                let canAfford = true;
+                let costHTML = '';
+                
+                for (const resource in upgrade.cost) {
+                    if (gameState.resources[resource] < upgrade.cost[resource]) {
+                        canAfford = false;
+                    }
+                    costHTML += `
+                        <div class="cost-item">
+                            <span>${resource}:</span>
+                            <span>${upgrade.cost[resource]}</span>
+                        </div>
+                    `;
+                }
+                
+                upgradesHTML += `
+                    <div class="cell-upgrade ${hasUpgrade ? 'upgraded' : ''}">
+                        <div class="cell-upgrade-info">
+                            <div class="cell-upgrade-name">${upgrade.name} ${hasUpgrade ? '<i class="fas fa-check" style="color: var(--success);"></i>' : ''}</div>
+                            <div class="cell-upgrade-description">${upgrade.description}</div>
+                        </div>
+                        <div class="cell-upgrade-cost">
+                            ${costHTML}
+                        </div>
+                        <button class="btn ${hasUpgrade ? 'btn-warning' : ''}" 
+                                data-upgrade="${upgrade.id}" 
+                                ${hasUpgrade ? 'disabled' : !canAfford ? 'disabled' : ''}>
+                            ${hasUpgrade ? 'Upgraded' : 'Upgrade'}
+                        </button>
+                    </div>
+                `;
+            });
+            
+            let statsHTML = '';
+            for (const stat in cell.stats) {
+                statsHTML += `
+                    <div class="cell-stat">
+                        <div class="cell-stat-name">${formatStatName(stat)}</div>
+                        <div class="cell-stat-value">${cell.stats[stat]}</div>
+                    </div>
+                `;
+            }
+            
+            let productionHTML = '';
+            for (const resource in cell.production) {
+                productionHTML += `
+                    <div class="cell-stat">
+                        <div class="cell-stat-name">${formatResourceName(resource)}</div>
+                        <div class="cell-stat-value">+${cell.production[resource]}/s</div>
+                    </div>
+                `;
+            }
+            
+            detailsContainer.innerHTML = `
+                <div class="cell-details-header">
+                    <div class="cell-details-icon" style="background: ${cellType.display.background}; box-shadow: 0 0 20px ${cellType.display.shadow};">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="cell-details-info">
+                        <div class="cell-details-name">${cell.name}</div>
+                        <div class="cell-details-type">${cellType.name} • Level ${cell.level}</div>
+                        <button class="btn btn-danger" id="remove-cell-btn">
+                            <i class="fas fa-trash"></i> Remove Cell
+                        </button>
+                    </div>
+                </div>
+                
+                <h3>Statistics</h3>
+                <div class="cell-details-stats">
+                    ${statsHTML}
+                </div>
+                
+                <h3>Production</h3>
+                <div class="cell-details-stats">
+                    ${productionHTML}
+                </div>
+                
+                <div class="cell-upgrades">
+                    <h3>Cell Upgrades</h3>
+                    ${upgradesHTML}
+                </div>
+            `;
+            
+            // Add event listeners for upgrade buttons
+            detailsContainer.querySelectorAll('.btn[data-upgrade]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const upgradeId = this.getAttribute('data-upgrade');
+                    upgradeCell(cell.id, upgradeId);
+                });
+            });
+            
+            // Add event listener for remove cell button
+            document.getElementById('remove-cell-btn').addEventListener('click', () => {
+                removeCell(cell.id);
+            });
+            
+            // Update organism display
+            updateOrganismDisplay(cell.type);
+        }
+
+        // Upgrade a cell
+        function upgradeCell(cellId, upgradeId) {
+            const cell = gameState.storage.cells.find(c => c.id === cellId);
+            if (!cell) return;
+            
+            const cellType = cellData[cell.type];
+            const upgrade = cellType.upgrades.find(u => u.id === upgradeId);
+            if (!upgrade) return;
+            
+            // Check if already upgraded
+            if (cell.upgrades.includes(upgradeId)) {
+                showNotification("This upgrade is already applied", 'warning');
                 return;
             }
             
             // Check if we have enough resources
-            if (gameState.resources.atp < 100 || gameState.resources.nucleotides < 50) {
-                showNotification("Not enough resources for evolution", 'warning');
+            let canAfford = true;
+            for (const resource in upgrade.cost) {
+                if (gameState.resources[resource] < upgrade.cost[resource]) {
+                    canAfford = false;
+                    break;
+                }
+            }
+            
+            if (!canAfford) {
+                showNotification("Not enough resources for this upgrade", 'warning');
                 return;
             }
             
-            // Consume resources
-            gameState.resources.atp -= 100;
-            gameState.resources.nucleotides -= 50;
-            
-            // Advance to next evolution stage
-            if (gameState.evolution.stage === 'prokaryote') {
-                gameState.evolution.stage = 'eukaryote';
-                gameState.evolution.nextStage = 'multicellular';
-                
-                // Unlock nucleus
-                gameState.organelles.nucleus.level = 1;
-                gameState.organelles.nucleus.health = 100;
-                
-                addEvent("Evolved to Eukaryote! Nucleus developed.");
-                showNotification("Evolved to Eukaryote!", 'evolution');
-            } else if (gameState.evolution.stage === 'eukaryote') {
-                gameState.evolution.stage = 'multicellular';
-                gameState.evolution.nextStage = 'specialized';
-                
-                addEvent("Evolved to Multicellular organism!");
-                showNotification("Evolved to Multicellular organism!", 'evolution');
-            } else if (gameState.evolution.stage === 'multicellular') {
-                gameState.evolution.stage = 'specialized';
-                gameState.evolution.nextStage = 'specialized';
-                
-                addEvent("Cell specialization achieved!");
-                showNotification("Cell specialization achieved!", 'evolution');
+            // Deduct costs
+            for (const resource in upgrade.cost) {
+                gameState.resources[resource] -= upgrade.cost[resource];
             }
             
-            // Reset evolution progress
-            gameState.evolution.progress = 0;
-            document.getElementById('evolve-btn').disabled = true;
+            // Apply upgrade
+            cell.upgrades.push(upgradeId);
             
+            // Apply effects
+            if (upgrade.effect.atpMultiplier) {
+                if (cell.production.atp) {
+                    // Remove old production and add new
+                    gameState.productionRates.atp -= cell.production.atp;
+                    cell.production.atp *= upgrade.effect.atpMultiplier;
+                    gameState.productionRates.atp += cell.production.atp;
+                }
+            }
+            
+            if (upgrade.effect.nucleotideMultiplier) {
+                if (cell.production.nucleotides) {
+                    gameState.productionRates.nucleotides -= cell.production.nucleotides;
+                    cell.production.nucleotides *= upgrade.effect.nucleotideMultiplier;
+                    gameState.productionRates.nucleotides += cell.production.nucleotides;
+                }
+            }
+            
+            if (upgrade.effect.enzymeMultiplier) {
+                if (cell.production.enzymes) {
+                    gameState.productionRates.enzymes -= cell.production.enzymes;
+                    cell.production.enzymes *= upgrade.effect.enzymeMultiplier;
+                    gameState.productionRates.enzymes += cell.production.enzymes;
+                }
+            }
+            
+            if (upgrade.effect.evolutionMultiplier) {
+                if (cell.production.evolutionPoints) {
+                    gameState.productionRates.evolutionPoints -= cell.production.evolutionPoints;
+                    cell.production.evolutionPoints *= upgrade.effect.evolutionMultiplier;
+                    gameState.productionRates.evolutionPoints += cell.production.evolutionPoints;
+                }
+            }
+            
+            if (upgrade.effect.addProduction) {
+                for (const resource in upgrade.effect.addProduction) {
+                    if (cell.production[resource]) {
+                        cell.production[resource] += upgrade.effect.addProduction[resource];
+                    } else {
+                        cell.production[resource] = upgrade.effect.addProduction[resource];
+                    }
+                    gameState.productionRates[resource] += upgrade.effect.addProduction[resource];
+                }
+            }
+            
+            // Increase cell level
+            cell.level++;
+            
+            // Add event
+            addEvent(`Upgraded ${cell.name} with ${upgrade.name}.`);
+            
+            // Show notification
+            showNotification(`Upgraded ${cell.name}!`, 'evolution');
+            
+            // Update UI and reselect the cell to refresh details
             updateUI();
+            selectCell(cellId);
+            
+            // Save game
+            saveGame();
         }
 
-        // Initiate evolution
-        function initiateEvolution(evolution) {
-            if (evolution === gameState.evolution.nextStage && gameState.evolution.progress >= 100) {
-                evolveCell();
+        // Remove a cell
+        function removeCell(cellId) {
+            const cellIndex = gameState.storage.cells.findIndex(c => c.id === cellId);
+            if (cellIndex === -1) return;
+            
+            const cell = gameState.storage.cells[cellIndex];
+            
+            // Remove production
+            for (const resource in cell.production) {
+                gameState.productionRates[resource] -= cell.production[resource];
             }
+            
+            // Remove from storage
+            gameState.storage.cells.splice(cellIndex, 1);
+            gameState.storage.used--;
+            gameState.stats.cells--;
+            
+            // Hide details
+            document.getElementById('cell-details').style.display = 'none';
+            gameState.selectedCell = null;
+            
+            // Add event
+            addEvent(`Removed ${cell.name} from storage.`);
+            
+            // Show notification
+            showNotification(`Removed ${cell.name}`, 'warning');
+            
+            // Update UI
+            updateUI();
+            renderCellStorage();
+            
+            // Save game
+            saveGame();
         }
 
         // Conduct research
-        function conductResearch(research) {
-            if (gameState.research[research]) {
-                showNotification("Research already completed", 'warning');
+        function conductResearch(researchId) {
+            const research = researchData[researchId];
+            const cost = research.cost;
+            
+            // Check if already researched
+            if (gameState.research[researchId]) {
+                showNotification(`${research.name} already researched`, 'warning');
                 return;
             }
             
-            // Check resource requirements
-            let atpCost, nucleotideCost;
-            switch(research) {
-                case 'dna-replication':
-                    atpCost = 80;
-                    nucleotideCost = 40;
-                    break;
-                case 'atp-synthesis':
-                    atpCost = 60;
-                    nucleotideCost = 30;
-                    break;
-                case 'membrane-strength':
-                    atpCost = 40;
-                    nucleotideCost = 20;
-                    break;
+            // Check if we have enough resources
+            for (const resource in cost) {
+                if (gameState.resources[resource] < cost[resource]) {
+                    showNotification(`Not enough ${resource} to research ${research.name}`, 'warning');
+                    return;
+                }
             }
             
-            if (gameState.resources.atp < atpCost || gameState.resources.nucleotides < nucleotideCost) {
-                showNotification("Not enough resources for research", 'warning');
-                return;
+            // Deduct cost
+            for (const resource in cost) {
+                gameState.resources[resource] -= cost[resource];
             }
             
-            // Consume resources
-            gameState.resources.atp -= atpCost;
-            gameState.resources.nucleotides -= nucleotideCost;
-            
-            // Complete research
-            gameState.research[research] = true;
+            // Research upgrade
+            gameState.research[researchId] = true;
+            gameState.stats.research++;
             
             // Apply research effects
-            switch(research) {
-                case 'dna-replication':
-                    // Improve division efficiency
-                    addEvent("DNA Replication researched! Division efficiency improved.");
-                    showNotification("DNA Replication researched!");
-                    break;
-                case 'atp-synthesis':
-                    // Increase ATP production
-                    addEvent("ATP Synthesis researched! Energy production increased.");
-                    showNotification("ATP Synthesis researched!");
-                    break;
-                case 'membrane-strength':
-                    // Improve membrane health
-                    gameState.organelles.membrane.health += 20;
-                    if (gameState.organelles.membrane.health > 100) {
-                        gameState.organelles.membrane.health = 100;
-                    }
-                    addEvent("Membrane Strength researched! Cell durability improved.");
-                    showNotification("Membrane Strength researched!");
-                    break;
-            }
+            applyResearchEffect(researchId);
             
+            // Add event
+            addEvent(`Researched ${research.name}.`);
+            
+            // Show notification
+            showNotification(`Researched ${research.name}!`, 'evolution');
+            
+            // Update UI
             updateUI();
+            
+            // Save game
+            saveGame();
         }
 
-        // Update the UI
+        // Apply research effects
+        function applyResearchEffect(researchId) {
+            switch(researchId) {
+                case 'atp':
+                    // Increase ATP production from cells
+                    gameState.storage.cells.forEach(cell => {
+                        if (cell.production.atp) {
+                            gameState.productionRates.atp -= cell.production.atp;
+                            cell.production.atp *= 1.25;
+                            gameState.productionRates.atp += cell.production.atp;
+                        }
+                    });
+                    break;
+                case 'gene':
+                    // This would unlock specialized cells in a full implementation
+                    break;
+                case 'division':
+                    // This would reduce cell creation costs in a full implementation
+                    break;
+                case 'recycling':
+                    // This would give resources when cells die in a full implementation
+                    break;
+                case 'acceleration':
+                    // Global production boost
+                    for (const resource in gameState.productionRates) {
+                        if (resource !== 'evolutionPoints') {
+                            gameState.productionRates[resource] *= 1.15;
+                        }
+                    }
+                    break;
+                case 'symbiosis':
+                    // Unlocks complex ecosystems (already available in UI)
+                    break;
+            }
+        }
+
+        // Evolve a biological entity
+        function evolveBiological(evolutionId) {
+            const evolution = evolutionData[evolutionId];
+            const cost = evolution.cost;
+            
+            // Check if we have enough resources
+            for (const resource in cost) {
+                if (gameState.resources[resource] < cost[resource]) {
+                    showNotification(`Not enough ${resource} to evolve`, 'warning');
+                    return;
+                }
+            }
+            
+            // Deduct costs
+            for (const resource in cost) {
+                gameState.resources[resource] -= cost[resource];
+            }
+            
+            // In a full implementation, we would actually evolve the biological entity
+            // For now, we'll just show a notification
+            showNotification(`Evolution initiated!`, 'evolution');
+            addEvent(`Initiated evolution process.`);
+            
+            gameState.stats.evolutions++;
+            
+            // Update UI
+            updateUI();
+            
+            // Save game
+            saveGame();
+        }
+
+        // Add biological entity to ecosystem
+        function addToEcosystem(entityId, type) {
+            const entity = biologicalData[entityId];
+            const ecosystemArray = gameState.ecosystem[type];
+            
+            // Create a new entity object for the ecosystem
+            const newEntity = {
+                id: entityId,
+                x: Math.random() * 80 + 10, // Random position (10% to 90%)
+                y: Math.random() * 80 + 10,
+                size: getEntitySize(entityId)
+            };
+            
+            ecosystemArray.push(newEntity);
+        }
+
+        // Get size for biological entity in ecosystem map
+        function getEntitySize(entityId) {
+            const sizes = {
+                prokaryote: 10,
+                eukaryote: 15,
+                specialized: 20,
+                stem: 12,
+                mitochondria: 8,
+                nucleus: 10,
+                ribosome: 6,
+                golgi: 8,
+                algae: 12,
+                protozoa: 14,
+                fungus: 18,
+                multicellular: 25
+            };
+            
+            return sizes[entityId] || 10;
+        }
+
+        // Render ecosystem map
+        function renderEcosystemMap() {
+            const ecosystemMap = document.getElementById('ecosystem-map');
+            ecosystemMap.innerHTML = '';
+            
+            // Render cells from storage
+            gameState.storage.cells.forEach(cell => {
+                const cellType = cellData[cell.type];
+                const cellElement = document.createElement('div');
+                cellElement.className = 'cell';
+                cellElement.style.left = `${Math.random() * 80 + 10}%`;
+                cellElement.style.top = `${Math.random() * 80 + 10}%`;
+                cellElement.style.width = `${getEntitySize(cell.type)}px`;
+                cellElement.style.height = `${getEntitySize(cell.type)}px`;
+                cellElement.style.background = cellType.display.background;
+                cellElement.style.boxShadow = `0 0 10px ${cellType.display.shadow}`;
+                
+                ecosystemMap.appendChild(cellElement);
+            });
+            
+            // Render other biological entities
+            for (const type in gameState.biologicalEntities) {
+                for (const entityId in gameState.biologicalEntities[type]) {
+                    const count = gameState.biologicalEntities[type][entityId].count;
+                    const entity = biologicalData[entityId];
+                    
+                    for (let i = 0; i < count; i++) {
+                        const element = document.createElement('div');
+                        element.className = type === 'organisms' ? 'organism' : 'cell';
+                        element.style.left = `${Math.random() * 80 + 10}%`;
+                        element.style.top = `${Math.random() * 80 + 10}%`;
+                        element.style.width = `${getEntitySize(entityId)}px`;
+                        element.style.height = `${getEntitySize(entityId)}px`;
+                        element.style.background = entity.display.background;
+                        element.style.boxShadow = `0 0 10px ${entity.display.shadow}`;
+                        
+                        ecosystemMap.appendChild(element);
+                    }
+                }
+            }
+        }
+
+        // Update organism display
+        function updateOrganismDisplay(entityId) {
+            const entity = cellData[entityId] || biologicalData[entityId];
+            const display = document.getElementById('organism-display');
+            const title = document.getElementById('display-title');
+            const stats = document.getElementById('display-stats');
+            
+            if (entity) {
+                display.style.background = entity.display.background;
+                display.style.boxShadow = `0 0 50px ${entity.display.shadow}`;
+                title.textContent = entity.name;
+                
+                if (entity.stats) {
+                    stats.textContent = entity.stats;
+                } else if (entity.baseStats) {
+                    // Create stats text for cells
+                    let statsText = '';
+                    for (const stat in entity.baseStats) {
+                        statsText += `${formatStatName(stat)}: ${entity.baseStats[stat]} | `;
+                    }
+                    stats.textContent = statsText.slice(0, -3); // Remove last " | "
+                }
+            }
+        }
+
+        // Update UI elements (optimized to only update changed elements)
         function updateUI() {
             // Update resource displays
-            document.getElementById('atp').textContent = Math.floor(gameState.resources.atp);
-            document.getElementById('glucose').textContent = Math.floor(gameState.resources.glucose);
-            document.getElementById('amino-acids').textContent = Math.floor(gameState.resources.aminoAcids);
-            document.getElementById('lipids').textContent = Math.floor(gameState.resources.lipids);
-            document.getElementById('nucleotides').textContent = Math.floor(gameState.resources.nucleotides);
-            
-            // Update cell stats
-            document.getElementById('cell-health').textContent = `${Math.floor(gameState.cell.health)}%`;
-            document.getElementById('cell-age').textContent = Math.floor(gameState.cell.age);
-            document.getElementById('division-readiness').textContent = `${Math.floor(gameState.cell.divisionProgress)}%`;
-            document.getElementById('evolution-stage').textContent = gameState.evolution.stage.charAt(0).toUpperCase() + gameState.evolution.stage.slice(1);
-            
-            // Update organelle list
-            updateOrganelleList();
-            
-            // Update research buttons
-            updateResearchButtons();
-            
-            // Update evolution button
-            document.getElementById('evolve-btn').disabled = gameState.evolution.progress < 100;
-            
-            // Update action buttons based on available resources
-            updateActionButtons();
-        }
-
-        // Update organelle list
-        function updateOrganelleList() {
-            const organelleList = document.getElementById('organelle-list');
-            organelleList.innerHTML = '';
-            
-            for (const organelle in gameState.organelles) {
-                if (gameState.organelles[organelle].level > 0) {
-                    const item = document.createElement('div');
-                    item.className = 'organelle-item';
-                    
-                    let icon, name;
-                    switch(organelle) {
-                        case 'membrane':
-                            icon = 'fas fa-circle';
-                            name = 'Cell Membrane';
-                            break;
-                        case 'cytoplasm':
-                            icon = 'fas fa-tint';
-                            name = 'Cytoplasm';
-                            break;
-                        case 'ribosomes':
-                            icon = 'fas fa-circle';
-                            name = 'Ribosomes';
-                            break;
-                        case 'mitochondria':
-                            icon = 'fas fa-bolt';
-                            name = 'Mitochondria';
-                            break;
-                        case 'nucleus':
-                            icon = 'fas fa-dna';
-                            name = 'Nucleus';
-                            break;
-                        case 'chloroplasts':
-                            icon = 'fas fa-leaf';
-                            name = 'Chloroplasts';
-                            break;
-                        case 'golgi':
-                            icon = 'fas fa-layer-group';
-                            name = 'Golgi Apparatus';
-                            break;
-                        case 'lysosomes':
-                            icon = 'fas fa-recycle';
-                            name = 'Lysosomes';
-                            break;
+            for (const resource in gameState.resources) {
+                const element = document.getElementById(resource);
+                if (element) {
+                    const newValue = Math.floor(gameState.resources[resource]).toLocaleString();
+                    if (element.textContent !== newValue) {
+                        element.textContent = newValue;
                     }
-                    
-                    item.innerHTML = `
-                        <div class="organelle-icon" style="background: ${getOrganelleColor(organelle)}">
-                            <i class="${icon}"></i>
-                        </div>
-                        <div class="organelle-info">
-                            <div class="organelle-name">${name}</div>
-                            <div class="organelle-status">Level ${gameState.organelles[organelle].level} | Health: ${Math.floor(gameState.organelles[organelle].health)}%</div>
-                        </div>
-                    `;
-                    
-                    organelleList.appendChild(item);
                 }
             }
-        }
-
-        // Get organelle color
-        function getOrganelleColor(organelle) {
-            switch(organelle) {
-                case 'membrane': return '#4caf50';
-                case 'cytoplasm': return '#ffeb3b';
-                case 'ribosomes': return '#9c27b0';
-                case 'mitochondria': return '#f44336';
-                case 'nucleus': return '#2196f3';
-                case 'chloroplasts': return '#4caf50';
-                case 'golgi': return '#ff9800';
-                case 'lysosomes': return '#00bcd4';
-                default: return '#cccccc';
-            }
-        }
-
-        // Update research buttons
-        function updateResearchButtons() {
-            document.querySelectorAll('.research-btn').forEach(button => {
-                const research = button.getAttribute('data-research');
-                
-                if (gameState.research[research]) {
-                    button.textContent = "Researched";
-                    button.disabled = true;
+            
+            // Update resource rate displays
+            document.querySelectorAll('.resource-rate').forEach(element => {
+                const resource = element.parentElement.querySelector('.resource-name').textContent.toLowerCase().replace(' ', '');
+                if (gameState.productionRates[resource]) {
+                    const newRate = `+${gameState.productionRates[resource].toFixed(1)}/sec`;
+                    if (element.textContent !== newRate) {
+                        element.textContent = newRate;
+                    }
                 }
             });
+            
+            // Update create buttons
+            document.querySelectorAll('.create-btn').forEach(button => {
+                const cellular = button.getAttribute('data-cellular');
+                let canAfford = true;
+                
+                if (cellular in cellData) {
+                    // Cell creation - check storage space
+                    if (gameState.storage.used >= gameState.storage.slots) {
+                        canAfford = false;
+                    } else {
+                        // Check resources for cells
+                        const cell = cellData[cellular];
+                        for (const resource in cell.cost) {
+                            if (gameState.resources[resource] < cell.cost[resource]) {
+                                canAfford = false;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Organelle/organism creation - check resources
+                    const entity = biologicalData[cellular];
+                    for (const resource in entity.cost) {
+                        if (gameState.resources[resource] < entity.cost[resource]) {
+                            canAfford = false;
+                            break;
+                        }
+                    }
+                }
+                
+                button.disabled = !canAfford;
+            });
+            
+            // Update research buttons
+            document.querySelectorAll('.research-btn').forEach(button => {
+                const researchId = button.getAttribute('data-research');
+                const research = researchData[researchId];
+                
+                if (gameState.research[researchId]) {
+                    button.textContent = "Researched";
+                    button.disabled = true;
+                } else {
+                    let canAfford = true;
+                    for (const resource in research.cost) {
+                        if (gameState.resources[resource] < research.cost[resource]) {
+                            canAfford = false;
+                            break;
+                        }
+                    }
+                    button.disabled = !canAfford;
+                }
+            });
+            
+            // Update stats
+            document.getElementById('stat-cells').textContent = gameState.stats.cells;
+            document.getElementById('stat-organelles').textContent = gameState.stats.organelles;
+            document.getElementById('stat-organisms').textContent = gameState.stats.organisms;
+            document.getElementById('stat-evolutions').textContent = gameState.stats.evolutions;
+            document.getElementById('stat-research').textContent = gameState.stats.research;
+            
+            // Update achievements
+            updateAchievementsUI();
         }
 
-        // Update action buttons based on available resources
-        function updateActionButtons() {
-            // Absorb nutrients
-            document.getElementById('absorb-btn').disabled = gameState.resources.atp < 5;
+        // Update game time display
+        function updateGameTime() {
+            const elapsed = Date.now() - gameState.stats.startTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            document.getElementById('stat-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Check for achievements
+        function checkAchievements() {
+            // First Cell - Create any cell
+            if (!gameState.achievements.firstCell && gameState.stats.cells > 0) {
+                gameState.achievements.firstCell = true;
+                unlockAchievement(1, "First Cell");
+            }
             
-            // Metabolize glucose
-            document.getElementById('metabolize-btn').disabled = gameState.resources.glucose < 10;
+            // Cellular Colony - Create 10 cells
+            if (!gameState.achievements.cellularColony && gameState.stats.cells >= 10) {
+                gameState.achievements.cellularColony = true;
+                unlockAchievement(2, "Cellular Colony");
+            }
             
-            // Synthesize proteins
-            document.getElementById('synthesize-btn').disabled = gameState.resources.aminoAcids < 5;
+            // Organelle Architect - Create 5 organelles
+            if (!gameState.achievements.organelleArchitect && gameState.stats.organelles >= 5) {
+                gameState.achievements.organelleArchitect = true;
+                unlockAchievement(3, "Organelle Architect");
+            }
             
-            // Replicate DNA
-            document.getElementById('replicate-btn').disabled = gameState.resources.nucleotides < 10;
+            // Simple Organism - Create a cell with 3 organelles (simplified)
+            if (!gameState.achievements.simpleOrganism && gameState.stats.cells >= 1 && gameState.stats.organelles >= 3) {
+                gameState.achievements.simpleOrganism = true;
+                unlockAchievement(4, "Simple Organism");
+            }
             
-            // Repair cell
-            document.getElementById('repair-btn').disabled = gameState.resources.atp < 20 || gameState.resources.aminoAcids < 10;
+            // Biological Master - Create one of each biological entity
+            if (!gameState.achievements.biologicalMaster) {
+                let allCreated = true;
+                
+                // Check cells
+                for (const cellType in cellData) {
+                    if (!gameState.storage.cells.some(cell => cell.type === cellType)) {
+                        allCreated = false;
+                        break;
+                    }
+                }
+                
+                // Check organelles and organisms
+                for (const type in gameState.biologicalEntities) {
+                    for (const entity in gameState.biologicalEntities[type]) {
+                        if (gameState.biologicalEntities[type][entity].count === 0) {
+                            allCreated = false;
+                            break;
+                        }
+                    }
+                    if (!allCreated) break;
+                }
+                
+                if (allCreated) {
+                    gameState.achievements.biologicalMaster = true;
+                    unlockAchievement(5, "Biological Master");
+                }
+            }
             
-            // Defend cell
-            document.getElementById('defend-btn').disabled = gameState.resources.atp < 15;
+            // Evolution Pioneer - Accumulate 1,000 evolution points
+            if (!gameState.achievements.evolutionPioneer && gameState.resources.evolutionPoints >= 1000) {
+                gameState.achievements.evolutionPioneer = true;
+                unlockAchievement(6, "Evolution Pioneer");
+            }
+            
+            // Ecosystem Engineer - Create your first multicellular organism
+            if (!gameState.achievements.ecosystemEngineer && gameState.biologicalEntities.organisms.multicellular.count > 0) {
+                gameState.achievements.ecosystemEngineer = true;
+                unlockAchievement(7, "Ecosystem Engineer");
+            }
+            
+            // Symbiosis Expert - Create a complex ecosystem
+            if (!gameState.achievements.symbiosisExpert && gameState.biologicalEntities.organisms.multicellular.count > 0 && gameState.stats.organisms >= 5) {
+                gameState.achievements.symbiosisExpert = true;
+                unlockAchievement(8, "Symbiosis Expert");
+            }
+        }
+
+        // Update achievements UI
+        function updateAchievementsUI() {
+            for (let i = 1; i <= 8; i++) {
+                const achievement = document.getElementById(`achievement-${i}`);
+                const achievementKey = Object.keys(gameState.achievements)[i-1];
+                
+                if (gameState.achievements[achievementKey]) {
+                    achievement.classList.add('unlocked');
+                }
+            }
+        }
+
+        // Unlock an achievement
+        function unlockAchievement(id, name) {
+            showNotification(`Achievement Unlocked: ${name}!`, 'evolution');
+            addEvent(`Achievement Unlocked: ${name}`);
+            saveGame();
         }
 
         // Add event to events list
@@ -1946,13 +3225,13 @@
             // Set appropriate icon
             const icon = notification.querySelector('i');
             if (type === 'evolution') {
-                icon.className = 'fas fa-atom';
+                icon.className = 'fas fa-dna';
             } else if (type === 'warning') {
                 icon.className = 'fas fa-exclamation-triangle';
             } else if (type === 'danger') {
                 icon.className = 'fas fa-radiation';
             } else {
-                icon.className = 'fas fa-dna';
+                icon.className = 'fas fa-circle';
             }
             
             notification.classList.add('show');
@@ -1962,14 +3241,34 @@
             }, 3000);
         }
 
-        // Save game
-        function saveGame() {
-            localStorage.setItem('bioGenesisSave', JSON.stringify(gameState));
+        // Format stat name for display
+        function formatStatName(stat) {
+            return stat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
         }
 
-        // Load game
+        // Format resource name for display
+        function formatResourceName(resource) {
+            const names = {
+                atp: "ATP",
+                glucose: "Glucose",
+                aminoAcids: "Amino Acids",
+                lipids: "Lipids",
+                nucleotides: "Nucleotides",
+                enzymes: "Enzymes",
+                evolutionPoints: "Evolution Points"
+            };
+            
+            return names[resource] || resource;
+        }
+
+        // Save game to localStorage
+        function saveGame() {
+            localStorage.setItem('bioGenesisCompleteSave', JSON.stringify(gameState));
+        }
+
+        // Load game from localStorage
         function loadGame() {
-            const saved = localStorage.getItem('bioGenesisSave');
+            const saved = localStorage.getItem('bioGenesisCompleteSave');
             if (saved) {
                 const savedState = JSON.parse(saved);
                 Object.assign(gameState, savedState);
@@ -1977,12 +3276,6 @@
                 addEvent("Game loaded successfully.");
             }
         }
-
-        // Initialize the game when the page loads
-        window.addEventListener('load', function() {
-            loadGame();
-            init();
-        });
     </script>
 </body>
 </html>
