@@ -1,1 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioGenesis: Cellular Evolution Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #0a1929;
+            --primary-medium: #1a2b3c;
+            --primary-light: #2a3b4c;
+            --membrane: #4caf50;
+            --cytoplasm: #ffeb3b;
+            --nucleus: #2196f3;
+            --mitochondria: #f44336;
+            --ribosome: #9c27b0;
+            --text-primary: #ffffff;
+            --text-secondary: #b0ffb0;
+            --accent: #00bcd4;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --evolution: #00ffcc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--membrane), var(--nucleus), var(--mitochondria), var(--evolution));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            color: var(--text-secondary);
+        }
+        
+        .game-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 80vh;
+        }
+        
+        .control-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        .cell-view {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cell-canvas-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #cellCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .cell-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-btn:hover {
+            background: #00a5bb;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .resource-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .resource-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .resource {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .resource-name {
+            font-size: 0.9rem;
+        }
+        
+        .resource-amount {
+            font-weight: bold;
+            color: var(--cytoplasm);
+        }
+        
+        .organelle-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .organelle-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .organelle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .organelle-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .organelle-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .organelle-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        .organelle-info {
+            flex: 1;
+        }
+        
+        .organelle-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .organelle-status {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        
+        .evolution-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .evolution-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .evolution-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .evolution-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .evolution-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .evolution-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .research-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .research-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .research-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .research-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .research-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .research-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        .research-info {
+            flex: 1;
+        }
+        
+        .research-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .research-description {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        
+        .research-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+        }
+        
+        .research-btn:hover:not(:disabled) {
+            background: #00a5bb;
+        }
+        
+        .research-btn:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .environment-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .environment-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .environment-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .environment-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .environment-name {
+            opacity: 0.8;
+        }
+        
+        .environment-value {
+            font-weight: bold;
+        }
+        
+        .events-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .events-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .event {
+            padding: 8px;
+            border-left: 3px solid var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0 5px 5px 0;
+            font-size: 0.8rem;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .event-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 3px;
+        }
+        
+        .cell-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .stat-name {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--cytoplasm);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.warning {
+            background: var(--warning);
+            color: #000;
+        }
+        
+        .notification.danger {
+            background: var(--danger);
+        }
+        
+        .notification.evolution {
+            background: var(--evolution);
+            color: #000;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        @media (max-width: 1200px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .control-panel {
+                flex-direction: row;
+                overflow-x: auto;
+                height: auto;
+            }
+            
+            .resource-panel, .organelle-panel, .evolution-panel, .research-panel, .environment-panel, .events-panel {
+                min-width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+            }
+            
+            .cell-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>BioGenesis: Cellular Evolution Simulator</h1>
+            <div class="subtitle">Guide your cell from a simple prokaryote to a complex eukaryotic organism</div>
+        </header>
+        
+        <div class="game-layout">
+            <div class="control-panel">
+                <div class="resource-panel">
+                    <h3>Cell Resources</h3>
+                    <div class="resource">
+                        <span class="resource-name">ATP</span>
+                        <span class="resource-amount" id="atp">100</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Glucose</span>
+                        <span class="resource-amount" id="glucose">50</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Amino Acids</span>
+                        <span class="resource-amount" id="amino-acids">25</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Lipids</span>
+                        <span class="resource-amount" id="lipids">10</span>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-name">Nucleotides</span>
+                        <span class="resource-amount" id="nucleotides">5</span>
+                    </div>
+                </div>
+                
+                <div class="organelle-panel">
+                    <h3>Organelles</h3>
+                    <div class="organelle-list" id="organelle-list">
+                        <!-- Organelles will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="evolution-panel">
+                    <h3>Evolution Paths</h3>
+                    <div class="evolution-options">
+                        <div class="evolution-option" data-evolution="prokaryote">
+                            <div>Prokaryote</div>
+                            <div>Basic cell with membrane</div>
+                        </div>
+                        <div class="evolution-option disabled" data-evolution="eukaryote">
+                            <div>Eukaryote</div>
+                            <div>Cell with nucleus</div>
+                        </div>
+                        <div class="evolution-option disabled" data-evolution="multicellular">
+                            <div>Multicellular</div>
+                            <div>Cell colony formation</div>
+                        </div>
+                        <div class="evolution-option disabled" data-evolution="specialized">
+                            <div>Specialized</div>
+                            <div>Cell differentiation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="research-panel">
+                    <h3>Research</h3>
+                    <div class="research-list">
+                        <div class="research-item">
+                            <div class="research-icon">
+                                <i class="fas fa-dna"></i>
+                            </div>
+                            <div class="research-info">
+                                <div class="research-name">DNA Replication</div>
+                                <div class="research-description">Improves cell division efficiency</div>
+                            </div>
+                            <button class="research-btn" data-research="dna-replication">Research</button>
+                        </div>
+                        <div class="research-item">
+                            <div class="research-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="research-info">
+                                <div class="research-name">ATP Synthesis</div>
+                                <div class="research-description">Increases energy production</div>
+                            </div>
+                            <button class="research-btn" data-research="atp-synthesis">Research</button>
+                        </div>
+                        <div class="research-item">
+                            <div class="research-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="research-info">
+                                <div class="research-name">Membrane Strength</div>
+                                <div class="research-description">Improves cell durability</div>
+                            </div>
+                            <button class="research-btn" data-research="membrane-strength">Research</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="environment-panel">
+                    <h3>Environment</h3>
+                    <div class="environment-info">
+                        <div class="environment-stat">
+                            <span class="environment-name">Temperature</span>
+                            <span class="environment-value" id="temperature">37°C</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">pH Level</span>
+                            <span class="environment-value" id="ph-level">7.2</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">Nutrient Density</span>
+                            <span class="environment-value" id="nutrient-density">Medium</span>
+                        </div>
+                        <div class="environment-stat">
+                            <span class="environment-name">Oxygen Level</span>
+                            <span class="environment-value" id="oxygen-level">Normal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="events-panel">
+                    <h3>Cell Events</h3>
+                    <div class="events-list" id="events-list">
+                        <div class="event">
+                            <div class="event-time">Just now</div>
+                            <div>Cell created. Begin by absorbing nutrients.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cell-view">
+                <div class="cell-stats">
+                    <div class="stat-card">
+                        <div class="stat-name">Cell Health</div>
+                        <div class="stat-value" id="cell-health">100%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Cell Age</div>
+                        <div class="stat-value" id="cell-age">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Division Readiness</div>
+                        <div class="stat-value" id="division-readiness">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-name">Evolution Stage</div>
+                        <div class="stat-value" id="evolution-stage">Prokaryote</div>
+                    </div>
+                </div>
+                
+                <div class="cell-canvas-container">
+                    <canvas id="cellCanvas"></canvas>
+                </div>
+                
+                <div class="cell-controls">
+                    <button class="control-btn" id="absorb-btn">
+                        <i class="fas fa-arrow-down"></i> Absorb Nutrients
+                    </button>
+                    <button class="control-btn" id="divide-btn" disabled>
+                        <i class="fas fa-divide"></i> Cell Division
+                    </button>
+                    <button class="control-btn" id="evolve-btn" disabled>
+                        <i class="fas fa-atom"></i> Evolve
+                    </button>
+                    <button class="control-btn" id="repair-btn">
+                        <i class="fas fa-band-aid"></i> Repair Cell
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-dna"></i>
+        <div id="notification-text">Notification</div>
+    </div>
 
+    <script>
+        // Game state
+        const gameState = {
+            resources: {
+                atp: 100,
+                glucose: 50,
+                aminoAcids: 25,
+                lipids: 10,
+                nucleotides: 5
+            },
+            organelles: {
+                membrane: { level: 1, health: 100 },
+                cytoplasm: { level: 1, health: 100 },
+                ribosomes: { level: 0, health: 0 },
+                mitochondria: { level: 0, health: 0 },
+                nucleus: { level: 0, health: 0 },
+                chloroplasts: { level: 0, health: 0 },
+                golgi: { level: 0, health: 0 },
+                lysosomes: { level: 0, health: 0 }
+            },
+            evolution: {
+                stage: 'prokaryote',
+                progress: 0,
+                nextStage: 'eukaryote'
+            },
+            research: {
+                'dna-replication': false,
+                'atp-synthesis': false,
+                'membrane-strength': false
+            },
+            cell: {
+                health: 100,
+                age: 0,
+                divisionProgress: 0,
+                size: 1.0
+            },
+            environment: {
+                temperature: 37,
+                pH: 7.2,
+                nutrientDensity: 'medium',
+                oxygenLevel: 'normal'
+            },
+            events: []
+        };
+
+        // Canvas and rendering variables
+        let canvas, ctx;
+        let cellX, cellY, cellRadius;
+        let nutrients = [];
+        let threats = [];
+        let lastUpdateTime = 0;
+        let animationFrameId = null;
+
+        // Initialize the game
+        function init() {
+            // Set up canvas
+            canvas = document.getElementById('cellCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Initialize cell position
+            cellX = canvas.width / 2;
+            cellY = canvas.height / 2;
+            cellRadius = 50;
+            
+            // Generate initial nutrients
+            generateNutrients(10);
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Start game loop
+            startGameLoop();
+            
+            // Update UI
+            updateUI();
+            
+            // Add initial event
+            addEvent("Cell created. Begin by absorbing nutrients.");
+        }
+
+        // Set up canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Update cell position to center
+            cellX = canvas.width / 2;
+            cellY = canvas.height / 2;
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Control buttons
+            document.getElementById('absorb-btn').addEventListener('click', absorbNutrients);
+            document.getElementById('divide-btn').addEventListener('click', cellDivision);
+            document.getElementById('evolve-btn').addEventListener('click', evolveCell);
+            document.getElementById('repair-btn').addEventListener('click', repairCell);
+            
+            // Research buttons
+            document.querySelectorAll('.research-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const research = this.getAttribute('data-research');
+                    conductResearch(research);
+                });
+            });
+            
+            // Evolution options
+            document.querySelectorAll('.evolution-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (!this.classList.contains('disabled')) {
+                        const evolution = this.getAttribute('data-evolution');
+                        initiateEvolution(evolution);
+                    }
+                });
+            });
+            
+            // Save game when leaving
+            window.addEventListener('beforeunload', saveGame);
+        }
+
+        // Start the game loop
+        function startGameLoop() {
+            function gameLoop(timestamp) {
+                if (!lastUpdateTime) lastUpdateTime = timestamp;
+                
+                const elapsed = timestamp - lastUpdateTime;
+                
+                if (elapsed > 100) { // Update every 100ms for smoother animation
+                    // Update game state
+                    updateGameState(elapsed);
+                    
+                    // Render the game
+                    render();
+                    
+                    lastUpdateTime = timestamp;
+                }
+                
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+            
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // Update game state
+        function updateGameState(elapsed) {
+            // Consume ATP over time
+            gameState.resources.atp -= 0.1 * (elapsed / 1000);
+            if (gameState.resources.atp < 0) gameState.resources.atp = 0;
+            
+            // Age the cell
+            gameState.cell.age += elapsed / 10000;
+            
+            // Randomly generate nutrients
+            if (Math.random() < 0.02) {
+                generateNutrients(1);
+            }
+            
+            // Randomly generate threats
+            if (Math.random() < 0.005) {
+                generateThreats(1);
+            }
+            
+            // Move nutrients
+            nutrients.forEach(nutrient => {
+                // Simple movement toward cell
+                const dx = cellX - nutrient.x;
+                const dy = cellY - nutrient.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < cellRadius + 10) {
+                    // Nutrient absorbed
+                    absorbNutrient(nutrient);
+                    nutrients.splice(nutrients.indexOf(nutrient), 1);
+                } else {
+                    // Move toward cell
+                    nutrient.x += (dx / dist) * 2;
+                    nutrient.y += (dy / dist) * 2;
+                }
+            });
+            
+            // Move threats
+            threats.forEach(threat => {
+                // Movement toward cell
+                const dx = cellX - threat.x;
+                const dy = cellY - threat.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < cellRadius + 10) {
+                    // Threat damages cell
+                    damageCell(threat.damage);
+                    threats.splice(threats.indexOf(threat), 1);
+                    addEvent(`Cell damaged by ${threat.type}!`);
+                } else {
+                    // Move toward cell
+                    threat.x += (dx / dist) * threat.speed;
+                    threat.y += (dy / dist) * threat.speed;
+                }
+            });
+            
+            // Update division readiness
+            updateDivisionReadiness();
+            
+            // Update evolution progress
+            updateEvolutionProgress();
+            
+            // Update UI
+            updateUI();
+        }
+
+        // Render the game
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawBackground();
+            
+            // Draw nutrients
+            drawNutrients();
+            
+            // Draw threats
+            drawThreats();
+            
+            // Draw cell
+            drawCell();
+            
+            // Draw UI elements
+            drawUI();
+        }
+
+        // Draw background
+        function drawBackground() {
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#0a1929');
+            gradient.addColorStop(1, '#1a2b3c');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw some background elements (bubbles, particles)
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 3;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.fill();
+            }
+        }
+
+        // Draw the cell
+        function drawCell() {
+            // Cell membrane
+            ctx.beginPath();
+            ctx.arc(cellX, cellY, cellRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#4caf50';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Cytoplasm
+            ctx.beginPath();
+            ctx.arc(cellX, cellY, cellRadius - 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 235, 59, 0.3)';
+            ctx.fill();
+            
+            // Draw organelles based on evolution stage
+            if (gameState.evolution.stage === 'prokaryote') {
+                drawProkaryoteOrganelles();
+            } else if (gameState.evolution.stage === 'eukaryote') {
+                drawEukaryoteOrganelles();
+            } else if (gameState.evolution.stage === 'multicellular') {
+                drawMulticellularStructure();
+            } else if (gameState.evolution.stage === 'specialized') {
+                drawSpecializedStructures();
+            }
+            
+            // Cell health indicator
+            const healthPercent = gameState.cell.health / 100;
+            ctx.beginPath();
+            ctx.arc(cellX, cellY, cellRadius + 10, 0, Math.PI * 2 * healthPercent);
+            ctx.strokeStyle = healthPercent > 0.7 ? '#4caf50' : healthPercent > 0.3 ? '#ff9800' : '#f44336';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Draw prokaryote organelles
+        function drawProkaryoteOrganelles() {
+            // Ribosomes (if present)
+            if (gameState.organelles.ribosomes.level > 0) {
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2;
+                    const x = cellX + Math.cos(angle) * (cellRadius - 15);
+                    const y = cellY + Math.sin(angle) * (cellRadius - 15);
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#9c27b0';
+                    ctx.fill();
+                }
+            }
+            
+            // DNA strand
+            ctx.beginPath();
+            for (let i = 0; i < 10; i++) {
+                const x = cellX - 20 + i * 4;
+                const y = cellY + Math.sin(i * 0.5) * 5;
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.strokeStyle = '#2196f3';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Draw eukaryote organelles
+        function drawEukaryoteOrganelles() {
+            // Nucleus
+            ctx.beginPath();
+            ctx.arc(cellX, cellY, cellRadius / 2, 0, Math.PI * 2);
+            ctx.strokeStyle = '#2196f3';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Mitochondria
+            if (gameState.organelles.mitochondria.level > 0) {
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i / 3) * Math.PI * 2;
+                    const x = cellX + Math.cos(angle) * (cellRadius - 20);
+                    const y = cellY + Math.sin(angle) * (cellRadius - 20);
+                    
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, 8, 5, angle, 0, Math.PI * 2);
+                    ctx.fillStyle = '#f44336';
+                    ctx.fill();
+                }
+            }
+            
+            // Other organelles would be drawn here based on what's unlocked
+        }
+
+        // Draw multicellular structure
+        function drawMulticellularStructure() {
+            // Draw multiple cells
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const x = cellX + Math.cos(angle) * (cellRadius + 10);
+                const y = cellY + Math.sin(angle) * (cellRadius + 10);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, cellRadius / 2, 0, Math.PI * 2);
+                ctx.strokeStyle = '#4caf50';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(x, y, cellRadius / 2 - 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 235, 59, 0.3)';
+                ctx.fill();
+            }
+        }
+
+        // Draw specialized structures
+        function drawSpecializedStructures() {
+            // Draw specialized cell structures
+            // This would include things like cilia, flagella, etc.
+            
+            // Flagella
+            for (let i = 0; i < 3; i++) {
+                const angle = (i / 3) * Math.PI * 2;
+                const startX = cellX + Math.cos(angle) * cellRadius;
+                const startY = cellY + Math.sin(angle) * cellRadius;
+                
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                
+                for (let j = 1; j <= 5; j++) {
+                    const segmentX = startX + Math.cos(angle) * 20 * j;
+                    const segmentY = startY + Math.sin(angle) * 20 * j;
+                    ctx.lineTo(segmentX, segmentY);
+                }
+                
+                ctx.strokeStyle = '#4caf50';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        // Draw nutrients
+        function drawNutrients() {
+            nutrients.forEach(nutrient => {
+                ctx.beginPath();
+                ctx.arc(nutrient.x, nutrient.y, 5, 0, Math.PI * 2);
+                
+                switch(nutrient.type) {
+                    case 'glucose':
+                        ctx.fillStyle = '#ffeb3b';
+                        break;
+                    case 'amino-acid':
+                        ctx.fillStyle = '#2196f3';
+                        break;
+                    case 'lipid':
+                        ctx.fillStyle = '#ff9800';
+                        break;
+                    case 'nucleotide':
+                        ctx.fillStyle = '#9c27b0';
+                        break;
+                }
+                
+                ctx.fill();
+                
+                // Add a glow effect
+                ctx.beginPath();
+                ctx.arc(nutrient.x, nutrient.y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fill();
+            });
+        }
+
+        // Draw threats
+        function drawThreats() {
+            threats.forEach(threat => {
+                ctx.beginPath();
+                
+                if (threat.type === 'virus') {
+                    // Draw virus as a spiky circle
+                    ctx.arc(threat.x, threat.y, 8, 0, Math.PI * 2);
+                    
+                    // Add spikes
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const spikeX = threat.x + Math.cos(angle) * 12;
+                        const spikeY = threat.y + Math.sin(angle) * 12;
+                        
+                        ctx.moveTo(threat.x, threat.y);
+                        ctx.lineTo(spikeX, spikeY);
+                    }
+                } else if (threat.type === 'toxin') {
+                    // Draw toxin as a jagged shape
+                    ctx.moveTo(threat.x - 8, threat.y);
+                    ctx.lineTo(threat.x - 4, threat.y - 6);
+                    ctx.lineTo(threat.x, threat.y);
+                    ctx.lineTo(threat.x + 4, threat.y + 6);
+                    ctx.lineTo(threat.x + 8, threat.y);
+                    ctx.lineTo(threat.x + 4, threat.y - 6);
+                    ctx.lineTo(threat.x, threat.y);
+                    ctx.lineTo(threat.x - 4, threat.y + 6);
+                    ctx.closePath();
+                } else if (threat.type === 'bacteria') {
+                    // Draw bacteria as a rod shape
+                    ctx.ellipse(threat.x, threat.y, 12, 5, 0, 0, Math.PI * 2);
+                }
+                
+                ctx.fillStyle = threat.type === 'virus' ? '#f44336' : 
+                               threat.type === 'toxin' ? '#ff9800' : '#9c27b0';
+                ctx.fill();
+            });
+        }
+
+        // Draw UI elements on canvas
+        function drawUI() {
+            // Division progress bar
+            const progress = gameState.cell.divisionProgress / 100;
+            if (progress > 0) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(canvas.width - 210, 20, 200, 20);
+                
+                ctx.fillStyle = '#4caf50';
+                ctx.fillRect(canvas.width - 210, 20, 200 * progress, 20);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Arial';
+                ctx.fillText('Division Progress', canvas.width - 210, 15);
+            }
+            
+            // Evolution progress
+            const evolutionProgress = gameState.evolution.progress / 100;
+            if (evolutionProgress > 0) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(canvas.width - 210, 50, 200, 20);
+                
+                ctx.fillStyle = '#00bcd4';
+                ctx.fillRect(canvas.width - 210, 50, 200 * evolutionProgress, 20);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Arial';
+                ctx.fillText('Evolution Progress', canvas.width - 210, 45);
+            }
+        }
+
+        // Generate nutrients
+        function generateNutrients(count) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 200 + 300;
+                const x = cellX + Math.cos(angle) * distance;
+                const y = cellY + Math.sin(angle) * distance;
+                
+                const types = ['glucose', 'amino-acid', 'lipid', 'nucleotide'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                nutrients.push({ x, y, type });
+            }
+        }
+
+        // Generate threats
+        function generateThreats(count) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 200 + 300;
+                const x = cellX + Math.cos(angle) * distance;
+                const y = cellY + Math.sin(angle) * distance;
+                
+                const types = ['virus', 'toxin', 'bacteria'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                let damage, speed;
+                switch(type) {
+                    case 'virus':
+                        damage = 10;
+                        speed = 1.5;
+                        break;
+                    case 'toxin':
+                        damage = 5;
+                        speed = 1;
+                        break;
+                    case 'bacteria':
+                        damage = 15;
+                        speed = 0.8;
+                        break;
+                }
+                
+                threats.push({ x, y, type, damage, speed });
+            }
+        }
+
+        // Absorb nutrients
+        function absorbNutrients() {
+            // Consume ATP to absorb nutrients
+            if (gameState.resources.atp < 5) {
+                showNotification("Not enough ATP to absorb nutrients", 'warning');
+                return;
+            }
+            
+            gameState.resources.atp -= 5;
+            
+            // Increase resource absorption rate temporarily
+            const absorptionRate = 2;
+            
+            // Find nearby nutrients
+            const nearbyNutrients = nutrients.filter(nutrient => {
+                const dx = cellX - nutrient.x;
+                const dy = cellY - nutrient.y;
+                return Math.sqrt(dx * dx + dy * dy) < cellRadius + 50;
+            });
+            
+            // Absorb nearby nutrients
+            nearbyNutrients.forEach(nutrient => {
+                absorbNutrient(nutrient);
+                nutrients.splice(nutrients.indexOf(nutrient), 1);
+            });
+            
+            if (nearbyNutrients.length > 0) {
+                addEvent(`Absorbed ${nearbyNutrients.length} nutrients`);
+                showNotification(`Absorbed ${nearbyNutrients.length} nutrients!`);
+            } else {
+                showNotification("No nutrients nearby to absorb", 'warning');
+            }
+            
+            updateUI();
+        }
+
+        // Absorb a single nutrient
+        function absorbNutrient(nutrient) {
+            switch(nutrient.type) {
+                case 'glucose':
+                    gameState.resources.glucose += 10;
+                    break;
+                case 'amino-acid':
+                    gameState.resources.aminoAcids += 5;
+                    break;
+                case 'lipid':
+                    gameState.resources.lipids += 3;
+                    break;
+                case 'nucleotide':
+                    gameState.resources.nucleotides += 2;
+                    break;
+            }
+            
+            // Small chance to gain ATP from absorption
+            if (Math.random() < 0.3) {
+                gameState.resources.atp += 2;
+            }
+        }
+
+        // Damage the cell
+        function damageCell(amount) {
+            gameState.cell.health -= amount;
+            if (gameState.cell.health < 0) gameState.cell.health = 0;
+            
+            // Also damage organelles
+            for (const organelle in gameState.organelles) {
+                if (gameState.organelles[organelle].health > 0) {
+                    gameState.organelles[organelle].health -= amount / 2;
+                    if (gameState.organelles[organelle].health < 0) {
+                        gameState.organelles[organelle].health = 0;
+                    }
+                }
+            }
+            
+            updateUI();
+        }
+
+        // Repair the cell
+        function repairCell() {
+            // Check if we have enough resources
+            if (gameState.resources.atp < 20 || gameState.resources.aminoAcids < 10) {
+                showNotification("Not enough resources for repair", 'warning');
+                return;
+            }
+            
+            // Consume resources
+            gameState.resources.atp -= 20;
+            gameState.resources.aminoAcids -= 10;
+            
+            // Repair cell
+            gameState.cell.health += 30;
+            if (gameState.cell.health > 100) gameState.cell.health = 100;
+            
+            // Repair organelles
+            for (const organelle in gameState.organelles) {
+                if (gameState.organelles[organelle].health > 0) {
+                    gameState.organelles[organelle].health += 15;
+                    if (gameState.organelles[organelle].health > 100) {
+                        gameState.organelles[organelle].health = 100;
+                    }
+                }
+            }
+            
+            addEvent("Cell repaired");
+            showNotification("Cell repaired!");
+            updateUI();
+        }
+
+        // Update division readiness
+        function updateDivisionReadiness() {
+            // Division requires resources and health
+            const resourceReadiness = Math.min(
+                gameState.resources.atp / 50,
+                gameState.resources.glucose / 30,
+                gameState.resources.aminoAcids / 20,
+                gameState.resources.lipids / 10,
+                gameState.resources.nucleotides / 5
+            );
+            
+            const healthReadiness = gameState.cell.health / 100;
+            
+            gameState.cell.divisionProgress = Math.min(resourceReadiness, healthReadiness) * 100;
+            
+            // Enable/disable division button
+            document.getElementById('divide-btn').disabled = gameState.cell.divisionProgress < 100;
+        }
+
+        // Cell division
+        function cellDivision() {
+            if (gameState.cell.divisionProgress < 100) {
+                showNotification("Cell not ready for division", 'warning');
+                return;
+            }
+            
+            // Consume resources for division
+            gameState.resources.atp -= 50;
+            gameState.resources.glucose -= 30;
+            gameState.resources.aminoAcids -= 20;
+            gameState.resources.lipids -= 10;
+            gameState.resources.nucleotides -= 5;
+            
+            // Reset division progress
+            gameState.cell.divisionProgress = 0;
+            
+            // Increase cell size slightly
+            gameState.cell.size += 0.1;
+            cellRadius = 50 * gameState.cell.size;
+            
+            // Gain evolution progress
+            gameState.evolution.progress += 5;
+            if (gameState.evolution.progress > 100) gameState.evolution.progress = 100;
+            
+            addEvent("Cell division completed");
+            showNotification("Cell division completed!");
+            
+            // Check if evolution is now possible
+            if (gameState.evolution.progress >= 100) {
+                document.getElementById('evolve-btn').disabled = false;
+                showNotification("Evolution possible!", 'evolution');
+            }
+            
+            updateUI();
+        }
+
+        // Update evolution progress
+        function updateEvolutionProgress() {
+            // Evolution progress increases slowly over time
+            if (gameState.evolution.progress < 100) {
+                gameState.evolution.progress += 0.01;
+            }
+            
+            // Update evolution options based on current stage
+            updateEvolutionOptions();
+        }
+
+        // Update evolution options
+        function updateEvolutionOptions() {
+            const options = document.querySelectorAll('.evolution-option');
+            
+            options.forEach(option => {
+                const evolution = option.getAttribute('data-evolution');
+                
+                if (evolution === gameState.evolution.stage) {
+                    option.style.background = 'rgba(0, 188, 212, 0.2)';
+                    option.classList.add('disabled');
+                } else if (evolution === gameState.evolution.nextStage && gameState.evolution.progress >= 100) {
+                    option.classList.remove('disabled');
+                } else {
+                    option.classList.add('disabled');
+                }
+            });
+        }
+
+        // Evolve the cell
+        function evolveCell() {
+            if (gameState.evolution.progress < 100) {
+                showNotification("Not enough evolution progress", 'warning');
+                return;
+            }
+            
+            // Check if we have enough resources
+            if (gameState.resources.atp < 100 || gameState.resources.nucleotides < 50) {
+                showNotification("Not enough resources for evolution", 'warning');
+                return;
+            }
+            
+            // Consume resources
+            gameState.resources.atp -= 100;
+            gameState.resources.nucleotides -= 50;
+            
+            // Advance to next evolution stage
+            if (gameState.evolution.stage === 'prokaryote') {
+                gameState.evolution.stage = 'eukaryote';
+                gameState.evolution.nextStage = 'multicellular';
+                
+                // Unlock nucleus
+                gameState.organelles.nucleus.level = 1;
+                gameState.organelles.nucleus.health = 100;
+                
+                addEvent("Evolved to Eukaryote! Nucleus developed.");
+                showNotification("Evolved to Eukaryote!", 'evolution');
+            } else if (gameState.evolution.stage === 'eukaryote') {
+                gameState.evolution.stage = 'multicellular';
+                gameState.evolution.nextStage = 'specialized';
+                
+                addEvent("Evolved to Multicellular organism!");
+                showNotification("Evolved to Multicellular organism!", 'evolution');
+            } else if (gameState.evolution.stage === 'multicellular') {
+                gameState.evolution.stage = 'specialized';
+                gameState.evolution.nextStage = 'specialized';
+                
+                addEvent("Cell specialization achieved!");
+                showNotification("Cell specialization achieved!", 'evolution');
+            }
+            
+            // Reset evolution progress
+            gameState.evolution.progress = 0;
+            document.getElementById('evolve-btn').disabled = true;
+            
+            updateUI();
+        }
+
+        // Initiate evolution
+        function initiateEvolution(evolution) {
+            if (evolution === gameState.evolution.nextStage && gameState.evolution.progress >= 100) {
+                evolveCell();
+            }
+        }
+
+        // Conduct research
+        function conductResearch(research) {
+            if (gameState.research[research]) {
+                showNotification("Research already completed", 'warning');
+                return;
+            }
+            
+            // Check resource requirements
+            let atpCost, nucleotideCost;
+            switch(research) {
+                case 'dna-replication':
+                    atpCost = 80;
+                    nucleotideCost = 40;
+                    break;
+                case 'atp-synthesis':
+                    atpCost = 60;
+                    nucleotideCost = 30;
+                    break;
+                case 'membrane-strength':
+                    atpCost = 40;
+                    nucleotideCost = 20;
+                    break;
+            }
+            
+            if (gameState.resources.atp < atpCost || gameState.resources.nucleotides < nucleotideCost) {
+                showNotification("Not enough resources for research", 'warning');
+                return;
+            }
+            
+            // Consume resources
+            gameState.resources.atp -= atpCost;
+            gameState.resources.nucleotides -= nucleotideCost;
+            
+            // Complete research
+            gameState.research[research] = true;
+            
+            // Apply research effects
+            switch(research) {
+                case 'dna-replication':
+                    // Improve division efficiency
+                    addEvent("DNA Replication researched! Division efficiency improved.");
+                    showNotification("DNA Replication researched!");
+                    break;
+                case 'atp-synthesis':
+                    // Increase ATP production
+                    addEvent("ATP Synthesis researched! Energy production increased.");
+                    showNotification("ATP Synthesis researched!");
+                    break;
+                case 'membrane-strength':
+                    // Improve membrane health
+                    gameState.organelles.membrane.health += 20;
+                    if (gameState.organelles.membrane.health > 100) {
+                        gameState.organelles.membrane.health = 100;
+                    }
+                    addEvent("Membrane Strength researched! Cell durability improved.");
+                    showNotification("Membrane Strength researched!");
+                    break;
+            }
+            
+            updateUI();
+        }
+
+        // Update the UI
+        function updateUI() {
+            // Update resource displays
+            document.getElementById('atp').textContent = Math.floor(gameState.resources.atp);
+            document.getElementById('glucose').textContent = Math.floor(gameState.resources.glucose);
+            document.getElementById('amino-acids').textContent = Math.floor(gameState.resources.aminoAcids);
+            document.getElementById('lipids').textContent = Math.floor(gameState.resources.lipids);
+            document.getElementById('nucleotides').textContent = Math.floor(gameState.resources.nucleotides);
+            
+            // Update cell stats
+            document.getElementById('cell-health').textContent = `${Math.floor(gameState.cell.health)}%`;
+            document.getElementById('cell-age').textContent = Math.floor(gameState.cell.age);
+            document.getElementById('division-readiness').textContent = `${Math.floor(gameState.cell.divisionProgress)}%`;
+            document.getElementById('evolution-stage').textContent = gameState.evolution.stage.charAt(0).toUpperCase() + gameState.evolution.stage.slice(1);
+            
+            // Update organelle list
+            updateOrganelleList();
+            
+            // Update research buttons
+            updateResearchButtons();
+            
+            // Update evolution button
+            document.getElementById('evolve-btn').disabled = gameState.evolution.progress < 100;
+        }
+
+        // Update organelle list
+        function updateOrganelleList() {
+            const organelleList = document.getElementById('organelle-list');
+            organelleList.innerHTML = '';
+            
+            for (const organelle in gameState.organelles) {
+                if (gameState.organelles[organelle].level > 0) {
+                    const item = document.createElement('div');
+                    item.className = 'organelle-item';
+                    
+                    let icon, name;
+                    switch(organelle) {
+                        case 'membrane':
+                            icon = 'fas fa-circle';
+                            name = 'Cell Membrane';
+                            break;
+                        case 'cytoplasm':
+                            icon = 'fas fa-tint';
+                            name = 'Cytoplasm';
+                            break;
+                        case 'ribosomes':
+                            icon = 'fas fa-circle';
+                            name = 'Ribosomes';
+                            break;
+                        case 'mitochondria':
+                            icon = 'fas fa-bolt';
+                            name = 'Mitochondria';
+                            break;
+                        case 'nucleus':
+                            icon = 'fas fa-dna';
+                            name = 'Nucleus';
+                            break;
+                        case 'chloroplasts':
+                            icon = 'fas fa-leaf';
+                            name = 'Chloroplasts';
+                            break;
+                        case 'golgi':
+                            icon = 'fas fa-layer-group';
+                            name = 'Golgi Apparatus';
+                            break;
+                        case 'lysosomes':
+                            icon = 'fas fa-recycle';
+                            name = 'Lysosomes';
+                            break;
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="organelle-icon" style="background: ${getOrganelleColor(organelle)}">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="organelle-info">
+                            <div class="organelle-name">${name}</div>
+                            <div class="organelle-status">Level ${gameState.organelles[organelle].level} | Health: ${Math.floor(gameState.organelles[organelle].health)}%</div>
+                        </div>
+                    `;
+                    
+                    organelleList.appendChild(item);
+                }
+            }
+        }
+
+        // Get organelle color
+        function getOrganelleColor(organelle) {
+            switch(organelle) {
+                case 'membrane': return '#4caf50';
+                case 'cytoplasm': return '#ffeb3b';
+                case 'ribosomes': return '#9c27b0';
+                case 'mitochondria': return '#f44336';
+                case 'nucleus': return '#2196f3';
+                case 'chloroplasts': return '#4caf50';
+                case 'golgi': return '#ff9800';
+                case 'lysosomes': return '#00bcd4';
+                default: return '#cccccc';
+            }
+        }
+
+        // Update research buttons
+        function updateResearchButtons() {
+            document.querySelectorAll('.research-btn').forEach(button => {
+                const research = button.getAttribute('data-research');
+                
+                if (gameState.research[research]) {
+                    button.textContent = "Researched";
+                    button.disabled = true;
+                }
+            });
+        }
+
+        // Add event to events list
+        function addEvent(text) {
+            const eventsList = document.getElementById('events-list');
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event';
+            eventElement.innerHTML = `
+                <div class="event-time">${timeString}</div>
+                <div>${text}</div>
+            `;
+            
+            eventsList.prepend(eventElement);
+            
+            // Limit events to 10
+            while (eventsList.children.length > 10) {
+                eventsList.removeChild(eventsList.lastChild);
+            }
+        }
+
+        // Show notification
+        function showNotification(text, type = '') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = text;
+            notification.className = 'notification';
+            
+            if (type) {
+                notification.classList.add(type);
+            }
+            
+            // Set appropriate icon
+            const icon = notification.querySelector('i');
+            if (type === 'evolution') {
+                icon.className = 'fas fa-atom';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle';
+            } else if (type === 'danger') {
+                icon.className = 'fas fa-radiation';
+            } else {
+                icon.className = 'fas fa-dna';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Save game
+        function saveGame() {
+            localStorage.setItem('bioGenesisSave', JSON.stringify(gameState));
+        }
+
+        // Load game
+        function loadGame() {
+            const saved = localStorage.getItem('bioGenesisSave');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                Object.assign(gameState, savedState);
+                
+                addEvent("Game loaded successfully.");
+            }
+        }
+
+        // Initialize the game when the page loads
+        window.addEventListener('load', function() {
+            loadGame();
+            init();
+        });
+    </script>
+</body>
+</html>
